@@ -26,9 +26,6 @@ const static smpl_t DEFAULT_ONSET_THRESHOLD = 0.5;
 const static smpl_t DEFAULT_ONSET_SILENCE = -50.0;
 const static smpl_t DEFAULT_ONSET_MINIOI_MS = 1;
 const static bool DEFAULT_ONSET_ADAPTIVE_WHITENING = true;
-
-// processors
-const static string PARAMETER_RECEIVER_ENDPOINT = "tcp://10.0.0.132:5555";
 const static vector<OnsetMethod> ONSET_PROCESSORS = {
         OnsetMethod::specflux,
         OnsetMethod::phase,
@@ -36,8 +33,13 @@ const static vector<OnsetMethod> ONSET_PROCESSORS = {
         OnsetMethod::energy
 };
 
+// processors
+const static string PARAMETER_RECEIVER_ENDPOINT = "tcp://10.0.0.132:44440";
+const static string ONSET_AGGREGATOR_OUTPUT_ENDPOINT = "tcp://*:44441";
+
 // flatBuffers
 const static int ONSET_SIZE = 24;
+const static int ONSET_AGGREGATE_SIZE = 72;
 const static int AUDIO_PACKET_SIZE = 1064;
 
 #endif //PERFORMER_CONFIG_H

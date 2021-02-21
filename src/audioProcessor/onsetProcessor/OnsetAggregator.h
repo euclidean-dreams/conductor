@@ -6,6 +6,7 @@
 #include "audioProcessor/AudioProcessor.h"
 #include "NetworkSocket.h"
 #include "Onset_generated.h"
+#include "OnsetAggregate_generated.h"
 
 using namespace flatbuffers;
 
@@ -19,6 +20,10 @@ private:
     inline void collectIdentities();
 
     inline void sendReadySignal();
+
+    inline bool receiveOnset(vector<uint64_t> &timestamps, vector<int8_t> &methods);
+
+    inline void sendOnsetAggregate(const vector<uint64_t> &timestamps, const vector<int8_t> &methods);
 
 public:
     static std::unique_ptr<OnsetAggregator> create(context_t &context, const string &inputEndpoint,

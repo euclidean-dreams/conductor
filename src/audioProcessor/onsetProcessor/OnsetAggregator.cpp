@@ -39,17 +39,40 @@ void OnsetAggregator::sendReadySignal() {
 }
 
 void OnsetAggregator::process() {
+    vector<uint64_t> timestamps;
+    vector<int8_t> methods;
+    bool detectedAtLeastOneOnset = false;
     for (int i = 0; i < onsetProcessorCount; i++) {
-        auto envelope = inputSocket->receive();
-        envelope->pop();
-        envelope->pop();
-        auto message = envelope->pop();
-        auto onset = GetOnset(message.data());
-        if (onset->timestamp() > 0) {
-            spdlog::get(LOGGER_NAME)->info("{} {}", EnumNameOnsetMethod(onset->method()), onset->timestamp());
+        auto detectedOnset = receiveOnset(timestamps, methods);
+        if (detectedOnset) {
+            detectedAtLeastOneOnset = true;
         }
     }
+    if (detectedAtLeastOneOnset) {
+        sendOnsetAggregate(timestamps, methods);
+    }
     sendReadySignal();
+}
+
+bool OnsetAggregator::receiveOnset(vector<uint64_t> &timestamps, vector<int8_t> &methods) {
+    auto envelope = inputSocket->receive();
+    envelope->pop();
+    envelope->pop();
+    auto message = envelope->pop();
+    auto onset = GetOnset(message.data());
+    methods.push_back(static_cast<int8_t>(onset->method()));
+    timestamps.push_back(onset->timestamp());
+    return onset->timestamp() > 0;
+}
+
+void OnsetAggregator::sendOnsetAggregate(const vector<uint64_t> &timestamps, const vector<int8_t> &methods) {
+    FlatBufferBuilder builder{ONSET_AGGREGATE_SIZE};
+    auto timestampsOffset = builder.CreateVector(timestamps);
+    auto methodsOffset = builder.CreateVector(methods);
+    auto onsetAggregate = CreateOnsetAggregate(builder, timestampsOffset, methodsOffset);
+    builder.Finish(onsetAggregate);
+    multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
+    outputSocket->send(message);
 }
 
 bool OnsetAggregator::shouldContinue() {
