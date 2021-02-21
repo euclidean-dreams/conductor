@@ -2,3 +2,6 @@
 	path = lib/impresario-utils
 	url = git@github.com:impresario-systems/impresario-utils.git
 	branch = dev
+[submodule "lib/impresario-serialization"]
+	path = lib/impresario-serialization
+	url = git@github.com:impresario-systems/impresario-serialization.git
