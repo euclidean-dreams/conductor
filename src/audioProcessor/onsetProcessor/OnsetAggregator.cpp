@@ -25,7 +25,7 @@ void OnsetAggregator::collectIdentities() {
         auto identity = envelope->popstr();
         identities.push_back(identity);
     }
-    spdlog::get(LOGGER_NAME)->info("onset processor registration count: {}", size(identities));
+    spdlog::get(LOGGER_NAME)->info("onset processor registration count: {}", identities.size());
 }
 
 void OnsetAggregator::sendReadySignal() {

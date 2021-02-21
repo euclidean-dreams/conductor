@@ -9,7 +9,7 @@ AudioProcessorSuite::AudioProcessorSuite(context_t &context, AudioStream &audioS
 
     auto onsetAggregatorInputEndpoint = generateInprocEndpoint();
     auto onsetAggregator = OnsetAggregator::create(context, onsetAggregatorInputEndpoint,
-                                                   ONSET_AGGREGATOR_OUTPUT_ENDPOINT, size(ONSET_PROCESSORS));
+                                                   ONSET_AGGREGATOR_OUTPUT_ENDPOINT, ONSET_PROCESSORS.size());
     audioProcessors.push_back(move(onsetAggregator));
 
     for (auto method : ONSET_PROCESSORS) {

@@ -8,7 +8,7 @@
 using namespace zmq;
 
 int main() {
-    spdlog::stdout_color_mt("conductor");
+    spdlog::stdout_color_mt(LOGGER_NAME);
     context_t context(1);
     auto audioStreamManager = make_unique<AudioStreamManager>(SAMPLE_RATE, PACKET_SIZE, RING_BUFFER_SIZE_MULTIPLIER);
     auto audioProcessorSuite = make_unique<AudioProcessorSuite>(context, audioStreamManager->getAudioStream());
