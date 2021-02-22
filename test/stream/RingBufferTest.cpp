@@ -1,7 +1,9 @@
-#include "gtest/gtest.h"
-#include "../../src/audioStream/RingBuffer.h"
+#include <gtest/gtest.h>
+#include "audioStream/RingBuffer.h"
 
-class RingBufferTest : public testing::Test {
+using namespace testing;
+
+class RingBufferTest : public Test {
 protected:
     RingBuffer ringBuffer{2, 3};
 
