@@ -6,7 +6,7 @@
 #include "audioProcessor/AudioProcessor.h"
 #include "NetworkSocket.h"
 #include "Onset_generated.h"
-#include "OnsetAggregate_generated.h"
+#include "AudioAttributes_generated.h"
 
 using namespace flatbuffers;
 

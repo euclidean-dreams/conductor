@@ -1,20 +1,21 @@
 #include "OnsetProcessor.h"
 
-std::unique_ptr<OnsetProcessor> OnsetProcessor::create(context_t &context, const string &parameterReceiverEndpoint,
+std::unique_ptr<OnsetProcessor> OnsetProcessor::create(context_t &context, const string &parameterEndpoint,
                                                        const string &inputEndpoint, const string &outputEndpoint,
                                                        OnsetMethod method) {
     auto input = make_unique<NetworkSocket>(context, inputEndpoint, socket_type::sub, false);
     input->setSubscriptionFilter("");
-    auto onsetOutput = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::req, false);
-    auto parameterReceiver = ParameterReceiver::create(context, parameterReceiverEndpoint, "");
-    return make_unique<OnsetProcessor>(move(input), move(onsetOutput), move(parameterReceiver), method);
+    auto output = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::req, false);
+    auto parameterSocket = make_unique<NetworkSocket>(context, parameterEndpoint, socket_type::sub, false);
+    parameterSocket->setSubscriptionFilter("");
+    return make_unique<OnsetProcessor>(move(input), move(output), move(parameterSocket), method);
 }
 
 OnsetProcessor::OnsetProcessor(std::unique_ptr<NetworkSocket> inputSocket, std::unique_ptr<NetworkSocket> outputSocket,
-                               std::unique_ptr<ParameterReceiver> parameterReceiver, OnsetMethod method)
+                               std::unique_ptr<NetworkSocket> parameterSocket, OnsetMethod method)
         : inputSocket{move(inputSocket)},
           outputSocket{move(outputSocket)},
-          parameterReceiver{move(parameterReceiver)},
+          parameterSocket{move(parameterSocket)},
           method{method},
           onsetAlgorithm{
                   new_aubio_onset(EnumNameOnsetMethod(method), PROCESSOR_BUFFER_SIZE, PROCESSOR_HOP_SIZE, SAMPLE_RATE)
@@ -37,10 +38,9 @@ OnsetProcessor::~OnsetProcessor() {
 }
 
 void OnsetProcessor::updateAlgorithmParameters() {
-    auto parameters = parameterReceiver->receive();
+    auto parameters = parameterSocket->receiveBuffer(recv_flags::dontwait);
     if (parameters != nullptr) {
         auto onsetParameters = GetOnsetProcessorParameters(parameters.get());
-        auto m = onsetParameters->method();
         if (onsetParameters->method() == method) {
             aubio_onset_set_threshold(onsetAlgorithm, onsetParameters->threshold());
             aubio_onset_set_minioi_ms(onsetAlgorithm, onsetParameters->minioi_ms());
@@ -67,16 +67,12 @@ void OnsetProcessor::waitForReadySignalFromOnsetAggregator() {
 
 void OnsetProcessor::process() {
     updateAlgorithmParameters();
-    auto audioPacket = receiveAudioPacket();
+    auto message = inputSocket->receive()->pop();
+    auto audioPacket = GetAudioPacket(message.data());
     auto onsetDelay = determineOnsetDelay(audioPacket->samples());
     auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
     sendOnset(onsetTimestamp);
     waitForReadySignalFromOnsetAggregator();
-}
-
-const AudioPacket *OnsetProcessor::receiveAudioPacket() {
-    auto message = inputSocket->receive()->pop();
-    return GetAudioPacket(message.data());
 }
 
 uint64_t OnsetProcessor::determineOnsetDelay(const Vector<float> *samples) {

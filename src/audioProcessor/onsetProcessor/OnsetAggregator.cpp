@@ -66,11 +66,12 @@ bool OnsetAggregator::receiveOnset(vector<uint64_t> &timestamps, vector<int8_t> 
 }
 
 void OnsetAggregator::sendOnsetAggregate(const vector<uint64_t> &timestamps, const vector<int8_t> &methods) {
-    FlatBufferBuilder builder{ONSET_AGGREGATE_SIZE};
+    FlatBufferBuilder builder{AUDIO_ATTRIBUTES_SIZE};
     auto timestampsOffset = builder.CreateVector(timestamps);
     auto methodsOffset = builder.CreateVector(methods);
     auto onsetAggregate = CreateOnsetAggregate(builder, timestampsOffset, methodsOffset);
-    builder.Finish(onsetAggregate);
+    auto audioAttributes = CreateAudioAttributes(builder, onsetAggregate);
+    builder.Finish(audioAttributes);
     multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
     outputSocket->send(message);
 }

@@ -13,7 +13,7 @@ AudioProcessorSuite::AudioProcessorSuite(context_t &context, AudioStream &audioS
     audioProcessors.push_back(move(onsetAggregator));
 
     for (auto method : ONSET_PROCESSORS) {
-        auto processor = OnsetProcessor::create(context, PARAMETER_RECEIVER_ENDPOINT, sourceOutputEndpoint,
+        auto processor = OnsetProcessor::create(context, PARAMETER_ENDPOINT, sourceOutputEndpoint,
                                                 onsetAggregatorInputEndpoint, method);
         audioProcessors.push_back(move(processor));
     }
