@@ -1,12 +1,4 @@
-[submodule "lib/impresario-utils"]
-	path = lib/impresario-utils
-	url = git@github.com:impresario-systems/impresario-utils.git
-	branch = dev
-[submodule "lib/impresario-serialization"]
-	path = lib/impresario-serialization
-	url = git@github.com:impresario-systems/impresario-serialization.git
-	branch = dev
-[submodule "lib/googletest"]
-	path = lib/googletest
-	url = git@github.com:impresario-systems/googletest.git
+[submodule "lib/cmake-utils"]
+	path = lib/cmake-utils
+	url = git@github.com:impresario-systems/cmake-utils.git
 	branch = master
