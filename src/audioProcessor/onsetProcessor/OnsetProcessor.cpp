@@ -55,7 +55,9 @@ void OnsetProcessor::setup() {
 }
 
 void OnsetProcessor::registerWithAggregator() {
-    spdlog::get(LOGGER_NAME)->info("registering {} onset processor with onset aggregator", EnumNameOnsetMethod(method));
+    spdlog::get(static_cast<string>(LOGGER_NAME))->info(
+            "registering {} onset processor with onset aggregator", EnumNameOnsetMethod(method)
+    );
     auto startSignal = multipart_t{nullptr, 0};
     outputSocket->send(startSignal);
     waitForReadySignalFromOnsetAggregator();

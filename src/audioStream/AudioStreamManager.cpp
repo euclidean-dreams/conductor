@@ -24,7 +24,7 @@ AudioStreamManager::~AudioStreamManager() {
 
 void AudioStreamManager::logIfError(PaError portAudioReturnCode) {
     if (portAudioReturnCode != paNoError) {
-        spdlog::get(LOGGER_NAME)->error(
+        spdlog::get(static_cast<string>(LOGGER_NAME))->error(
                 "portaudio encountered an error: {}", Pa_GetErrorText(portAudioReturnCode)
         );
     }
