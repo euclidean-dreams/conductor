@@ -28,10 +28,6 @@ private:
 
     inline void updateAlgorithmParameters();
 
-    inline void registerWithAggregator();
-
-    inline void waitForReadySignalFromOnsetAggregator();
-
     inline uint64_t determineOnsetDelay(const Vector<float> *samples);
 
     static inline uint64_t determineOnsetTimestamp(uint64_t onsetDelay, uint64_t audioPacketTimestamp);

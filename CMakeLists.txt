@@ -34,9 +34,10 @@ set(
         src/audioProcessor/AudioProcessor.h
         src/audioProcessor/AudioProcessorSuite.cpp src/audioProcessor/AudioProcessorSuite.h
         src/audioProcessor/AudioStreamSource.cpp src/audioProcessor/AudioStreamSource.h
+        src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
+        src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
-        src/audioProcessor/onsetProcessor/OnsetProcessor.cpp src/audioProcessor/onsetProcessor/OnsetProcessor.h
-        src/audioProcessor/onsetProcessor/OnsetAggregator.cpp src/audioProcessor/onsetProcessor/OnsetAggregator.h
+
 )
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
@@ -51,6 +52,7 @@ list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)
 
+find_package(cppzmq)
 # finalize
 foreach (target IN LISTS TARGETS)
     target_include_directories(${target} PRIVATE src)
@@ -58,6 +60,6 @@ foreach (target IN LISTS TARGETS)
     target_link_libraries(${target} PRIVATE impresario-serialization)
     target_link_libraries(${target} PRIVATE aubio)
     target_link_libraries(${target} PRIVATE portaudio)
-    target_link_libraries(${target} PRIVATE zmq)
+    target_link_libraries(${target} PRIVATE cppzmq)
     target_link_libraries(${target} PRIVATE pthread)
 endforeach ()

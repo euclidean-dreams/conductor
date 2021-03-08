@@ -5,7 +5,7 @@ std::unique_ptr<OnsetProcessor> OnsetProcessor::create(context_t &context, const
                                                        OnsetMethod method) {
     auto input = make_unique<NetworkSocket>(context, inputEndpoint, socket_type::sub, false);
     input->setSubscriptionFilter("");
-    auto output = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::req, false);
+    auto output = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::push, false);
     auto parameterSocket = make_unique<NetworkSocket>(context, parameterEndpoint, socket_type::sub, false);
     parameterSocket->setSubscriptionFilter("");
     return make_unique<OnsetProcessor>(move(input), move(output), move(parameterSocket), method);
@@ -31,9 +31,7 @@ OnsetProcessor::OnsetProcessor(std::unique_ptr<NetworkSocket> inputSocket, std::
 
 OnsetProcessor::~OnsetProcessor() {
     del_aubio_onset(onsetAlgorithm);
-    if (onsetInput != nullptr) {
-        del_fvec(onsetInput);
-    }
+    del_fvec(onsetInput);
     del_fvec(onsetResultWrapper);
 }
 
@@ -51,20 +49,7 @@ void OnsetProcessor::updateAlgorithmParameters() {
 }
 
 void OnsetProcessor::setup() {
-    registerWithAggregator();
-}
 
-void OnsetProcessor::registerWithAggregator() {
-    spdlog::get(static_cast<string>(LOGGER_NAME))->info(
-            "registering {} onset processor with onset aggregator", EnumNameOnsetMethod(method)
-    );
-    auto startSignal = multipart_t{nullptr, 0};
-    outputSocket->send(startSignal);
-    waitForReadySignalFromOnsetAggregator();
-}
-
-void OnsetProcessor::waitForReadySignalFromOnsetAggregator() {
-    outputSocket->receive();
 }
 
 void OnsetProcessor::process() {
@@ -74,7 +59,6 @@ void OnsetProcessor::process() {
     auto onsetDelay = determineOnsetDelay(audioPacket->samples());
     auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
     sendOnset(onsetTimestamp);
-    waitForReadySignalFromOnsetAggregator();
 }
 
 uint64_t OnsetProcessor::determineOnsetDelay(const Vector<float> *samples) {

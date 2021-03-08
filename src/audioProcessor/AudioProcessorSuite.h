@@ -9,16 +9,16 @@
 #include "NonCopyable.h"
 #include "NetworkSocket.h"
 #include "AudioStreamSource.h"
+#include "AudioProcessorSink.h"
 #include "audioStream/AudioStream.h"
-#include "onsetProcessor/OnsetProcessor.h"
-#include "onsetProcessor/OnsetAggregator.h"
+#include "OnsetProcessor.h"
 
 using namespace std;
 using namespace zmq;
 
 class AudioProcessorSuite : NonCopyable {
 private:
-    vector <std::unique_ptr<AudioProcessor>> audioProcessors;
+    vector<std::unique_ptr<AudioProcessor>> audioProcessors;
     int endpointCounter;
 
     inline string generateInprocEndpoint();

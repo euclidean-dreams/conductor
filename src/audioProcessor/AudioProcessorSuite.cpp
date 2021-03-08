@@ -7,15 +7,15 @@ AudioProcessorSuite::AudioProcessorSuite(context_t &context, AudioStream &audioS
     auto audioStreamSource = AudioStreamSource::create(context, audioStream, sourceOutputEndpoint);
     audioProcessors.push_back(move(audioStreamSource));
 
-    auto onsetAggregatorInputEndpoint = generateInprocEndpoint();
-    auto onsetAggregator = OnsetAggregator::create(context, onsetAggregatorInputEndpoint,
-                                                   static_cast<string>(ONSET_AGGREGATOR_OUTPUT_ENDPOINT),
-                                                   ONSET_PROCESSORS.size());
-    audioProcessors.push_back(move(onsetAggregator));
+    auto sinkInputEndpoint = generateInprocEndpoint();
+    auto sinkOutputEndpoint = static_cast<string>(ONSET_AGGREGATOR_OUTPUT_ENDPOINT);
+    auto audioProcessorSink = AudioProcessorSink::create(context, sinkInputEndpoint, sinkOutputEndpoint);
+    audioProcessors.push_back(move(audioProcessorSink));
 
+    auto parameterEndpoint = static_cast<string>(PARAMETER_ENDPOINT);
     for (auto method : ONSET_PROCESSORS) {
-        auto processor = OnsetProcessor::create(context, static_cast<string>(PARAMETER_ENDPOINT), sourceOutputEndpoint,
-                                                onsetAggregatorInputEndpoint, method);
+        auto processor = OnsetProcessor::create(context, parameterEndpoint, sourceOutputEndpoint, sinkInputEndpoint,
+                                                method);
         audioProcessors.push_back(move(processor));
     }
 }
