@@ -8,7 +8,7 @@ AudioProcessorSuite::AudioProcessorSuite(context_t &context, AudioStream &audioS
     audioProcessors.push_back(move(audioStreamSource));
 
     auto sinkInputEndpoint = generateInprocEndpoint();
-    auto sinkOutputEndpoint = static_cast<string>(ONSET_AGGREGATOR_OUTPUT_ENDPOINT);
+    auto sinkOutputEndpoint = static_cast<string>(CONDUCTOR_OUTPUT_ENDPOINT);
     auto audioProcessorSink = AudioProcessorSink::create(context, sinkInputEndpoint, sinkOutputEndpoint);
     audioProcessors.push_back(move(audioProcessorSink));
 

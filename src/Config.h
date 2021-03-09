@@ -12,8 +12,8 @@ using namespace ImpresarioSerialization;
 constexpr string_view LOGGER_NAME = "conductor";
 
 // audio
-constexpr int PROCESSOR_HOP_SIZE = 256;
-constexpr int PROCESSOR_BUFFER_SIZE = 1024;
+constexpr int PROCESSOR_HOP_SIZE = 128;
+constexpr int PROCESSOR_BUFFER_SIZE = 512;
 constexpr float SAMPLE_RATE = 44100.00;
 constexpr int PACKET_SIZE = PROCESSOR_HOP_SIZE;
 constexpr int RING_BUFFER_SIZE_MULTIPLIER = 16;
@@ -40,11 +40,10 @@ constexpr array<OnsetMethod, 9> ONSET_PROCESSORS = {
 
 // processors
 constexpr string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
-constexpr string_view ONSET_AGGREGATOR_OUTPUT_ENDPOINT = "tcp://*:44441";
+constexpr string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
 
 // flatBuffers
 constexpr int ONSET_SIZE = 24;
-constexpr int AUDIO_ATTRIBUTES_SIZE = 88;
 constexpr int AUDIO_PACKET_SIZE = 1064;
 
 #endif //PERFORMER_CONFIG_H
