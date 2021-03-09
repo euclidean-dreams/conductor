@@ -57,8 +57,10 @@ void OnsetProcessor::process() {
     auto message = inputSocket->receive()->pop();
     auto audioPacket = GetAudioPacket(message.data());
     auto onsetDelay = determineOnsetDelay(audioPacket->samples());
-    auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
-    sendOnset(onsetTimestamp);
+    if (onsetDelay > 0) {
+        auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
+        sendOnset(onsetTimestamp);
+    }
 }
 
 uint64_t OnsetProcessor::determineOnsetDelay(const Vector<float> *samples) {
