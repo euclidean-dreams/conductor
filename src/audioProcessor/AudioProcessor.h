@@ -1,9 +1,11 @@
 #ifndef CONDUCTOR_AUDIOPROCESSOR_H
 #define CONDUCTOR_AUDIOPROCESSOR_H
 
-#include "NonCopyable.h"
+#include <NonCopyable.h>
 
-class AudioProcessor : NonCopyable {
+namespace conductor {
+
+class AudioProcessor : impresarioUtils::NonCopyable {
 public:
     virtual ~AudioProcessor() = default;
 
@@ -13,5 +15,7 @@ public:
 
     virtual bool shouldContinue() = 0;
 };
+
+}
 
 #endif //PERFORMER_AUDIOPROCESSOR_H

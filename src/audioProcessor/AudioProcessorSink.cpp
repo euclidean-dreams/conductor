@@ -1,14 +1,18 @@
 #include "AudioProcessorSink.h"
 
-std::unique_ptr<AudioProcessorSink> AudioProcessorSink::create(context_t &context, const string &inputEndpoint,
-                                                               const string &outputEndpoint) {
-    auto input = make_unique<NetworkSocket>(context, inputEndpoint, socket_type::pull, true);
-    auto output = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::pub, true);
-    auto proxy = make_unique<NetworkProxy>(move(input), move(output));
-    return make_unique<AudioProcessorSink>(move(proxy));
+namespace conductor {
+
+std::unique_ptr<AudioProcessorSink> AudioProcessorSink::create(zmq::context_t &context,
+                                                               const std::string &inputEndpoint,
+                                                               const std::string &outputEndpoint) {
+    auto input = std::make_unique<impresarioUtils::NetworkSocket>(context, inputEndpoint, zmq::socket_type::pull, true);
+    auto output = std::make_unique<impresarioUtils::NetworkSocket>(context, outputEndpoint, zmq::socket_type::pub,
+                                                                   true);
+    auto proxy = std::make_unique<impresarioUtils::NetworkProxy>(move(input), move(output));
+    return std::make_unique<AudioProcessorSink>(move(proxy));
 }
 
-AudioProcessorSink::AudioProcessorSink(std::unique_ptr<NetworkProxy> proxy)
+AudioProcessorSink::AudioProcessorSink(std::unique_ptr<impresarioUtils::NetworkProxy> proxy)
         : proxy{move(proxy)} {
 
 }
@@ -23,4 +27,6 @@ void AudioProcessorSink::process() {
 
 bool AudioProcessorSink::shouldContinue() {
     return true;
+}
+
 }

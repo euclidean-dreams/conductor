@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "audioStream/RingBuffer.h"
 
-using namespace testing;
+
 
 class RingBufferTest : public Test {
 protected:

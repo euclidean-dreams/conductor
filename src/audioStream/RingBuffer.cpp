@@ -1,5 +1,7 @@
 #include "RingBuffer.h"
 
+namespace conductor {
+
 RingBuffer::RingBuffer(int packetSize, int bufferMultiplier)
         : packetSize{packetSize},
           bufferSize{packetSize * bufferMultiplier},
@@ -18,8 +20,8 @@ void RingBuffer::addSamples(const float *samples, unsigned long count) {
     }
 }
 
-std::unique_ptr<vector<float>> RingBuffer::getNextPacket() {
-    auto packet = make_unique<vector<float>>(readIterator, readIterator + packetSize);
+std::unique_ptr<std::vector<float>> RingBuffer::getNextPacket() {
+    auto packet = std::make_unique<std::vector<float>>(readIterator, readIterator + packetSize);
     readIterator += packetSize;
     if (readIterator >= internalBuffer.end()) {
         readIterator = internalBuffer.cbegin();
@@ -38,4 +40,6 @@ bool RingBuffer::nextPacketIsReady() const {
 
 int RingBuffer::getPacketSize() const {
     return packetSize;
+}
+
 }

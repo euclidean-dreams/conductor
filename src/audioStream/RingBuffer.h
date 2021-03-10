@@ -3,18 +3,17 @@
 
 #include <memory>
 #include <vector>
-#include "Config.h"
-#include "AudioStream.h"
+#include "audioStream/AudioStream.h"
 
-using namespace std;
+namespace conductor {
 
 class RingBuffer : public AudioStream {
 private:
     int packetSize;
     int bufferSize;
-    vector<float> internalBuffer;
-    vector<float>::const_iterator readIterator;
-    vector<float>::iterator writeIterator;
+    std::vector<float> internalBuffer;
+    std::vector<float>::const_iterator readIterator;
+    std::vector<float>::iterator writeIterator;
 
 public:
     explicit RingBuffer(int packetSize, int bufferMultiplier);
@@ -25,7 +24,9 @@ public:
 
     bool nextPacketIsReady() const override;
 
-    std::unique_ptr<vector<float>> getNextPacket() override;
+    std::unique_ptr<std::vector<float>> getNextPacket() override;
 };
+
+}
 
 #endif //PERFORMER_RINGBUFFER_H

@@ -5,11 +5,10 @@
 #include <aubio/aubio.h>
 #include "OnsetMethod_generated.h"
 
-using namespace std;
-using namespace ImpresarioSerialization;
+namespace conductor {
 
 // logger
-constexpr string_view LOGGER_NAME = "conductor";
+constexpr std::string_view LOGGER_NAME = "conductor";
 
 // audio
 constexpr int PROCESSOR_HOP_SIZE = 128;
@@ -19,31 +18,29 @@ constexpr int PACKET_SIZE = PROCESSOR_HOP_SIZE;
 constexpr int RING_BUFFER_SIZE_MULTIPLIER = 16;
 
 // audio source
-constexpr int AUDIO_STREAM_QUERY_INTERVAL = 500;
+constexpr int AUDIO_STREAM_QUERY_INTERVAL = 250;
 
 // onset
 constexpr smpl_t DEFAULT_ONSET_THRESHOLD = 0.6;
 constexpr smpl_t DEFAULT_ONSET_SILENCE = -50.0;
 constexpr smpl_t DEFAULT_ONSET_MINIOI_MS = 1;
 constexpr bool DEFAULT_ONSET_ADAPTIVE_WHITENING = true;
-constexpr array<OnsetMethod, 9> ONSET_PROCESSORS = {
-        OnsetMethod::energy,
-        OnsetMethod::hfc,
-        OnsetMethod::complex,
-        OnsetMethod::phase,
-        OnsetMethod::wphase,
-        OnsetMethod::specdiff,
-        OnsetMethod::kl,
-        OnsetMethod::mkl,
-        OnsetMethod::specflux
+constexpr std::array<ImpresarioSerialization::OnsetMethod, 9> ONSET_PROCESSORS = {
+        ImpresarioSerialization::OnsetMethod::energy,
+        ImpresarioSerialization::OnsetMethod::hfc,
+        ImpresarioSerialization::OnsetMethod::complex,
+        ImpresarioSerialization::OnsetMethod::phase,
+        ImpresarioSerialization::OnsetMethod::wphase,
+        ImpresarioSerialization::OnsetMethod::specdiff,
+        ImpresarioSerialization::OnsetMethod::kl,
+        ImpresarioSerialization::OnsetMethod::mkl,
+        ImpresarioSerialization::OnsetMethod::specflux
 };
 
 // processors
-constexpr string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
-constexpr string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
+constexpr std::string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
+constexpr std::string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
 
-// flatBuffers
-constexpr int ONSET_SIZE = 24;
-constexpr int AUDIO_PACKET_SIZE = 1064;
+}
 
 #endif //PERFORMER_CONFIG_H

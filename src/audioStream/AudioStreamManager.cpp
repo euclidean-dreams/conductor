@@ -1,10 +1,12 @@
 #include "AudioStreamManager.h"
 
+namespace conductor {
+
 AudioStreamManager::AudioStreamManager(float sampleRate, int packetSize, int bufferSizeMultiplier)
         : stream{},
           ringBuffer{packetSize, bufferSizeMultiplier} {
-    logIfError(Pa_Initialize());
-    logIfError(Pa_OpenDefaultStream(
+    throwOnError(Pa_Initialize());
+    throwOnError(Pa_OpenDefaultStream(
             &stream,
             1,
             0,
@@ -15,18 +17,16 @@ AudioStreamManager::AudioStreamManager(float sampleRate, int packetSize, int buf
             &ringBuffer
     ));
     PaAlsa_EnableRealtimeScheduling(stream, true);
-    logIfError(Pa_StartStream(stream));
+    throwOnError(Pa_StartStream(stream));
 }
 
 AudioStreamManager::~AudioStreamManager() {
-    logIfError(Pa_Terminate());
+    throwOnError(Pa_Terminate());
 }
 
-void AudioStreamManager::logIfError(PaError portAudioReturnCode) {
+void AudioStreamManager::throwOnError(PaError portAudioReturnCode) {
     if (portAudioReturnCode != paNoError) {
-        spdlog::get(static_cast<string>(LOGGER_NAME))->error(
-                "portaudio encountered an error: {}", Pa_GetErrorText(portAudioReturnCode)
-        );
+        throw std::runtime_error(Pa_GetErrorText(portAudioReturnCode));
     }
 }
 
@@ -44,4 +44,6 @@ int AudioStreamManager::streamCallback(const void *input,
     auto ringBuffer = (RingBuffer *) userData;
     ringBuffer->addSamples(samples, frameCount);
     return paContinue;
+}
+
 }

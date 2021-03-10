@@ -38,7 +38,7 @@ set(
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
 
-)
+        src/Bootstrapper.cpp src/Bootstrapper.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 

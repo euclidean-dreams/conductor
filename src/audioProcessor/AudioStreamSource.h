@@ -1,37 +1,36 @@
 #ifndef CONDUCTOR_AUDIOMANAGER_H
 #define CONDUCTOR_AUDIOMANAGER_H
 
+#include <chrono>
 #include <thread>
-#include <memory>
+#include <zmq.hpp>
+#include <NetworkSocket.h>
+#include <Time.h>
+#include <AudioPacket_generated.h>
 #include "Config.h"
-#include "Utils.h"
-#include "AudioProcessor.h"
-#include "NetworkSocket.h"
 #include "audioStream/AudioStream.h"
-#include "AudioPacket_generated.h"
+#include "audioProcessor/AudioProcessor.h"
 
-using namespace ImpresarioSerialization;
-using namespace flatbuffers;
-using namespace std::chrono;
-using namespace std::this_thread;
+namespace conductor {
 
 class AudioStreamSource : public AudioProcessor {
 private:
     AudioStream &audioStream;
-    std::unique_ptr<NetworkSocket> outputSocket;
+    std::unique_ptr<impresarioUtils::NetworkSocket> outputSocket;
 
 public:
-    static std::unique_ptr<AudioProcessor> create(context_t &context, AudioStream &audioStream,
-                                                  const string &outputEndpoint);
+    static std::unique_ptr<AudioProcessor> create(zmq::context_t &context, AudioStream &audioStream,
+                                                  const std::string &outputEndpoint);
 
-    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<NetworkSocket> outputSocket);
+    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<impresarioUtils::NetworkSocket> outputSocket);
 
     void setup() override {};
 
     void process() override;
 
     bool shouldContinue() override;
-
 };
+
+}
 
 #endif //PERFORMER_AUDIOMANAGER_H

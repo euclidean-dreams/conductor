@@ -3,11 +3,11 @@
 
 #include <memory>
 #include <vector>
-#include "NonCopyable.h"
+#include <NonCopyable.h>
 
-using namespace std;
+namespace conductor {
 
-class AudioStream : NonCopyable {
+class AudioStream : impresarioUtils::NonCopyable {
 public:
     virtual ~AudioStream() = default;
 
@@ -15,7 +15,9 @@ public:
 
     virtual bool nextPacketIsReady() const = 0;
 
-    virtual std::unique_ptr<vector<float>> getNextPacket() = 0;
+    virtual std::unique_ptr<std::vector<float>> getNextPacket() = 0;
 };
+
+}
 
 #endif //CONDUCTOR_AUDIOSTREAM_H

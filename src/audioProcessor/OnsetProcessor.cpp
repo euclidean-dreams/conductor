@@ -1,18 +1,25 @@
 #include "OnsetProcessor.h"
 
-std::unique_ptr<OnsetProcessor> OnsetProcessor::create(context_t &context, const string &parameterEndpoint,
-                                                       const string &inputEndpoint, const string &outputEndpoint,
-                                                       OnsetMethod method) {
-    auto input = make_unique<NetworkSocket>(context, inputEndpoint, socket_type::sub, false);
+namespace conductor {
+
+std::unique_ptr<OnsetProcessor> OnsetProcessor::create(zmq::context_t &context, const std::string &parameterEndpoint,
+                                                       const std::string &inputEndpoint,
+                                                       const std::string &outputEndpoint,
+                                                       ImpresarioSerialization::OnsetMethod method) {
+    auto input = std::make_unique<impresarioUtils::NetworkSocket>(context, inputEndpoint, zmq::socket_type::sub, false);
     input->setSubscriptionFilter("");
-    auto output = make_unique<NetworkSocket>(context, outputEndpoint, socket_type::push, false);
-    auto parameterSocket = make_unique<NetworkSocket>(context, parameterEndpoint, socket_type::sub, false);
+    auto output = std::make_unique<impresarioUtils::NetworkSocket>(context, outputEndpoint, zmq::socket_type::push,
+                                                                   false);
+    auto parameterSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, parameterEndpoint,
+                                                                            zmq::socket_type::sub, false);
     parameterSocket->setSubscriptionFilter("");
-    return make_unique<OnsetProcessor>(move(input), move(output), move(parameterSocket), method);
+    return std::make_unique<OnsetProcessor>(move(input), move(output), move(parameterSocket), method);
 }
 
-OnsetProcessor::OnsetProcessor(std::unique_ptr<NetworkSocket> inputSocket, std::unique_ptr<NetworkSocket> outputSocket,
-                               std::unique_ptr<NetworkSocket> parameterSocket, OnsetMethod method)
+OnsetProcessor::OnsetProcessor(std::unique_ptr<impresarioUtils::NetworkSocket> inputSocket,
+                               std::unique_ptr<impresarioUtils::NetworkSocket> outputSocket,
+                               std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
+                               ImpresarioSerialization::OnsetMethod method)
         : inputSocket{move(inputSocket)},
           outputSocket{move(outputSocket)},
           parameterSocket{move(parameterSocket)},
@@ -36,9 +43,9 @@ OnsetProcessor::~OnsetProcessor() {
 }
 
 void OnsetProcessor::updateAlgorithmParameters() {
-    auto parameters = parameterSocket->receiveBuffer(recv_flags::dontwait);
+    auto parameters = parameterSocket->receiveBuffer(zmq::recv_flags::dontwait);
     if (parameters != nullptr) {
-        auto onsetParameters = GetOnsetProcessorParameters(parameters.get());
+        auto onsetParameters = ImpresarioSerialization::GetOnsetProcessorParameters(parameters.get());
         if (onsetParameters->method() == method) {
             aubio_onset_set_threshold(onsetAlgorithm, onsetParameters->threshold());
             aubio_onset_set_minioi_ms(onsetAlgorithm, onsetParameters->minioi_ms());
@@ -55,7 +62,7 @@ void OnsetProcessor::setup() {
 void OnsetProcessor::process() {
     updateAlgorithmParameters();
     auto message = inputSocket->receive()->pop();
-    auto audioPacket = GetAudioPacket(message.data());
+    auto audioPacket = ImpresarioSerialization::GetAudioPacket(message.data());
     auto onsetDelay = determineOnsetDelay(audioPacket->samples());
     if (onsetDelay > 0) {
         auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
@@ -63,7 +70,7 @@ void OnsetProcessor::process() {
     }
 }
 
-uint64_t OnsetProcessor::determineOnsetDelay(const Vector<float> *samples) {
+uint64_t OnsetProcessor::determineOnsetDelay(const flatbuffers::Vector<float> *samples) {
     for (int i = 0; i < samples->size(); i++) {
         onsetInput->data[i] = (*samples)[i];
     }
@@ -75,7 +82,7 @@ uint64_t OnsetProcessor::determineOnsetDelay(const Vector<float> *samples) {
 
 uint64_t OnsetProcessor::determineOnsetTimestamp(uint64_t onsetDelay, uint64_t audioPacketTimestamp) {
     if (onsetDelay > 0) {
-        auto currentTime = getCurrentTime();
+        auto currentTime = impresarioUtils::getCurrentTime();
         auto totalDelay = onsetDelay + (currentTime - audioPacketTimestamp);
         return currentTime - totalDelay;
     } else {
@@ -84,10 +91,10 @@ uint64_t OnsetProcessor::determineOnsetTimestamp(uint64_t onsetDelay, uint64_t a
 }
 
 void OnsetProcessor::sendOnset(uint64_t onsetTimestamp) {
-    FlatBufferBuilder builder{ONSET_SIZE};
+    flatbuffers::FlatBufferBuilder builder{};
     auto onset = CreateOnset(builder, onsetTimestamp, method);
     builder.Finish(onset);
-    multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
+    zmq::multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
     outputSocket->send(message);
 }
 
@@ -95,3 +102,4 @@ bool OnsetProcessor::shouldContinue() {
     return true;
 }
 
+}
