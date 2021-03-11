@@ -14,15 +14,15 @@ constexpr std::string_view LOGGER_NAME = "conductor";
 constexpr int PROCESSOR_HOP_SIZE = 128;
 constexpr int PROCESSOR_BUFFER_SIZE = 512;
 constexpr float SAMPLE_RATE = 44100.00;
-constexpr int PACKET_SIZE = PROCESSOR_HOP_SIZE;
+constexpr int AUDIO_PACKET_SIZE = PROCESSOR_HOP_SIZE;
 constexpr int RING_BUFFER_SIZE_MULTIPLIER = 16;
 
 // audio source
 constexpr int AUDIO_STREAM_QUERY_INTERVAL = 250;
 
 // onset
-constexpr smpl_t DEFAULT_ONSET_THRESHOLD = 0.6;
-constexpr smpl_t DEFAULT_ONSET_SILENCE = -50.0;
+constexpr smpl_t DEFAULT_ONSET_THRESHOLD = 0.3;
+constexpr smpl_t DEFAULT_ONSET_SILENCE = -60.0;
 constexpr smpl_t DEFAULT_ONSET_MINIOI_MS = 1;
 constexpr bool DEFAULT_ONSET_ADAPTIVE_WHITENING = true;
 constexpr std::array<ImpresarioSerialization::OnsetMethod, 9> ONSET_PROCESSORS = {

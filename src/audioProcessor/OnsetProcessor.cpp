@@ -27,7 +27,7 @@ OnsetProcessor::OnsetProcessor(std::unique_ptr<impresarioUtils::NetworkSocket> i
           onsetAlgorithm{
                   new_aubio_onset(EnumNameOnsetMethod(method), PROCESSOR_BUFFER_SIZE, PROCESSOR_HOP_SIZE, SAMPLE_RATE)
           },
-          onsetInput{new_fvec(PACKET_SIZE)},
+          onsetInput{new_fvec(AUDIO_PACKET_SIZE)},
           onsetResultWrapper{new_fvec(1)} {
     aubio_onset_set_threshold(onsetAlgorithm, DEFAULT_ONSET_THRESHOLD);
     aubio_onset_set_minioi_ms(onsetAlgorithm, DEFAULT_ONSET_MINIOI_MS);

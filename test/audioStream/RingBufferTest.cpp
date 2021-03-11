@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include "audioStream/RingBuffer.h"
 
+namespace conductor {
 
-
-class RingBufferTest : public Test {
+class RingBufferTest : public testing::Test {
 protected:
     RingBuffer ringBuffer{2, 3};
 
@@ -98,4 +98,6 @@ TEST_F(RingBufferTest, DoubleWrap) {
     nextPacketMatchesExpected(ringBuffer, expected5);
     float expected6[] = {12.0, 13.0};
     nextPacketMatchesExpected(ringBuffer, expected6);
+}
+
 }

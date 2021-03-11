@@ -3,7 +3,7 @@ project(conductor VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_compile_options(-Wno-psabi)
+add_compile_options(-Wno-psabi -w -O0 -g3 -no-pie)
 
 include(lib/cmake-utils/dependency-integrator.cmake)
 integrate_cmake_dependency(
@@ -38,7 +38,13 @@ set(
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
 
-        src/Bootstrapper.cpp src/Bootstrapper.h)
+        src/Bootstrapper.cpp src/Bootstrapper.h
+
+        src/packet/Packet.h
+        src/packet/PacketPublisher.cpp src/packet/PacketPublisher.h
+        src/packet/AudioPacket.cpp src/packet/AudioPacket.h
+
+)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -46,14 +52,22 @@ add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 set(
         TEST_FILES
 
-        test/stream/RingBufferTest.cpp
+        test/audioStream/RingBufferTest.cpp
+        test/packet/AudioPacketTest.cpp
+        test/packet/PacketPublisherTest.cpp
+
 )
 list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)
 
-find_package(cppzmq)
+# isolator++ settings
+set(LD_BIND_NOW 1)
+target_link_libraries(test-conductor PRIVATE /usr/lib64/typemock/libisolator.a)
+target_include_directories(test-conductor PRIVATE /usr/include/typemock)
+
 # finalize
+find_package(cppzmq)
 foreach (target IN LISTS TARGETS)
     target_include_directories(${target} PRIVATE src)
     target_link_libraries(${target} PRIVATE impresario-utils)

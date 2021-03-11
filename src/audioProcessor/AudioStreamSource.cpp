@@ -24,7 +24,11 @@ void AudioStreamSource::process() {
         auto audioPacket = ImpresarioSerialization::CreateAudioPacket(builder, timestamp, samplesOffset);
         builder.Finish(audioPacket);
         zmq::multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
+        auto preSend = impresarioUtils::getElapsedTime(timestamp);
         outputSocket->send(message);
+        auto postSend = impresarioUtils::getElapsedTime(timestamp);
+        spdlog::get((std::string) LOGGER_NAME)->info("pre send: {}, post send: {}", preSend, postSend);
+
     } else {
         std::this_thread::sleep_for(std::chrono::microseconds(AUDIO_STREAM_QUERY_INTERVAL));
     }

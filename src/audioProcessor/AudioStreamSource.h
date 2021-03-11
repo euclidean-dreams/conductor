@@ -11,6 +11,8 @@
 #include "audioStream/AudioStream.h"
 #include "audioProcessor/AudioProcessor.h"
 
+
+#include <spdlog/spdlog.h>
 namespace conductor {
 
 class AudioStreamSource : public AudioProcessor {
