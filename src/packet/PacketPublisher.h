@@ -25,7 +25,7 @@ public:
 
     int registerSubscriber();
 
-    bool nextPacketsAreReady(int subscriberId, int packetCount);
+    int availablePackets(int subscriberId);
 
     std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getNextPackets(int subscriberId, int packetCount);
 

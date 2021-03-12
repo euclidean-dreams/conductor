@@ -40,13 +40,11 @@ int PacketPublisher::registerSubscriber() {
     return static_cast<int>(subscriberIterators.size() - 1);
 }
 
-bool PacketPublisher::nextPacketsAreReady(int subscriberId, int packetCount) {
+int PacketPublisher::availablePackets(int subscriberId) {
     std::lock_guard<std::mutex> lock{mutex};
     auto copiedIterator{subscriberIterators[subscriberId]};
-    while (packetCount > 0) {
-        if (copiedIterator == packets.cend()) {
-            return false;
-        }
+    auto packetCount = 0;
+    while (copiedIterator != packets.cend()) {
         copiedIterator++;
         packetCount--;
     }

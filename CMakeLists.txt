@@ -3,7 +3,7 @@ project(conductor VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_compile_options(-Wno-psabi -w -O0 -g3 -no-pie)
+add_compile_options(-Wno-psabi)
 
 include(lib/cmake-utils/dependency-integrator.cmake)
 integrate_cmake_dependency(
@@ -56,15 +56,10 @@ set(
         test/packet/AudioPacketTest.cpp
         test/packet/PacketPublisherTest.cpp
 
-)
+        test/packet/PacketMock.h)
 list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)
-
-# isolator++ settings
-set(LD_BIND_NOW 1)
-target_link_libraries(test-conductor PRIVATE /usr/lib64/typemock/libisolator.a)
-target_include_directories(test-conductor PRIVATE /usr/include/typemock)
 
 # finalize
 find_package(cppzmq)
