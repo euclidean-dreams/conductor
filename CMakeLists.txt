@@ -42,10 +42,10 @@ set(
         src/packet/PacketSpout.cpp src/packet/PacketSpout.h
 
         src/packet/Packet.h
+        src/packet/NotSerializableException.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
 
-        src/packet/NotSerializableException.h
 )
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
