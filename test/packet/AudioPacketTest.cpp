@@ -14,7 +14,7 @@ protected:
     }
 };
 
-TEST_F(AudioPacketTest, AddSampleSuccess) {
+TEST_F(AudioPacketTest, AddSample) {
     AudioPacket audioPacket{};
     audioPacket.addSample(0.0f);
 }

@@ -12,9 +12,13 @@ namespace conductor {
 
 class PacketPublisher : impresarioUtils::NonCopyable {
 private:
-    std::mutex mutex;
+    std::recursive_mutex mutex;
     std::list<std::shared_ptr<const Packet>> packets;
     std::vector<std::_List_const_iterator<std::shared_ptr<const Packet>>> subscriberIterators;
+
+    void validateSubscriberId(int subscriberId);
+
+    void validatePacketsAvailable(int subscriberId, int packetCount);
 
 public:
     PacketPublisher();
@@ -27,7 +31,7 @@ public:
 
     int availablePackets(int subscriberId);
 
-    std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getNextPackets(int subscriberId, int packetCount);
+    std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getPackets(int subscriberId, int packetCount);
 
     void concludePacketUse(int subscriberId, int packetCount);
 };
