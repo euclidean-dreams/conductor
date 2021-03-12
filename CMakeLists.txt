@@ -26,6 +26,7 @@ integrate_cmake_dependency(
 set(
         SOURCE_FILES
         src/Config.h
+        src/Bootstrapper.cpp src/Bootstrapper.h
 
         src/audioStream/AudioStream.h
         src/audioStream/AudioStreamManager.cpp src/audioStream/AudioStreamManager.h
@@ -37,12 +38,10 @@ set(
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
-
-        src/Bootstrapper.cpp src/Bootstrapper.h
-
         src/packet/Packet.h
-        src/packet/PacketPublisher.cpp src/packet/PacketPublisher.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
+        src/packet/PacketPublisher.cpp src/packet/PacketPublisher.h
+        src/packet/PacketSubscriber.cpp src/packet/PacketSubscriber.h
 
 )
 list(APPEND TARGETS conductor)
@@ -53,10 +52,11 @@ set(
         TEST_FILES
 
         test/audioStream/RingBufferTest.cpp
+        test/packet/PacketMock.h
         test/packet/AudioPacketTest.cpp
         test/packet/PacketPublisherTest.cpp
 
-        test/packet/PacketMock.h)
+)
 list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)

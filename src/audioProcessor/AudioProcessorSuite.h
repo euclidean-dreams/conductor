@@ -10,6 +10,7 @@
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/OnsetProcessor.h"
 #include "audioStream/AudioStream.h"
+#include "packet/PacketPublisher.h"
 
 namespace conductor {
 

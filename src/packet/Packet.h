@@ -8,7 +8,6 @@ namespace conductor {
 class Packet : impresarioUtils::NonCopyable {
 public:
     virtual ~Packet() = default;
-
 };
 
 }

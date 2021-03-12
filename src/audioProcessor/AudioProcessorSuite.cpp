@@ -7,7 +7,8 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
           endpointCounter{0} {
     // source
     auto sourceOutputEndpoint = generateInprocEndpoint();
-    auto audioStreamSource = AudioStreamSource::create(context, audioStream, sourceOutputEndpoint);
+    auto audioStreamOutput = std::make_unique<PacketPublisher>();
+    auto audioStreamSource = std::make_unique<AudioStreamSource>(audioStream, move(audioStreamOutput));
     audioProcessors.push_back(move(audioStreamSource));
 
     // sink

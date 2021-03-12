@@ -20,9 +20,12 @@ void RingBuffer::addSamples(const float *samples, unsigned long count) {
     }
 }
 
-std::unique_ptr<std::vector<float>> RingBuffer::getNextPacket() {
-    auto packet = std::make_unique<std::vector<float>>(readIterator, readIterator + packetSize);
-    readIterator += packetSize;
+std::unique_ptr<AudioPacket> RingBuffer::getNextPacket() {
+    auto packet = std::make_unique<AudioPacket>();
+    for (int i = 0; i < packetSize; i++) {
+        packet->addSample(*readIterator);
+        readIterator++;
+    }
     if (readIterator >= internalBuffer.end()) {
         readIterator = internalBuffer.cbegin();
     }

@@ -24,7 +24,7 @@ public:
 
     bool nextPacketIsReady() const override;
 
-    std::unique_ptr<std::vector<float>> getNextPacket() override;
+    std::unique_ptr<AudioPacket> getNextPacket() override;
 };
 
 }

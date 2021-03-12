@@ -19,6 +19,7 @@ constexpr int RING_BUFFER_SIZE_MULTIPLIER = 16;
 
 // audio source
 constexpr int AUDIO_STREAM_QUERY_INTERVAL = 250;
+constexpr int PACKET_SUBSCRIBER_QUERY_INTERVAL = 50;
 
 // onset
 constexpr smpl_t DEFAULT_ONSET_THRESHOLD = 0.3;

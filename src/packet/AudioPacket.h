@@ -14,6 +14,8 @@ private:
     bool finalized;
 
 public:
+    static const AudioPacket &from(const Packet &packet);
+
     AudioPacket();
 
     void addSample(float sample);

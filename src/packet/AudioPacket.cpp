@@ -2,6 +2,10 @@
 
 namespace conductor {
 
+const AudioPacket &AudioPacket::from(const Packet &packet) {
+    return dynamic_cast<const AudioPacket &>(packet);
+}
+
 AudioPacket::AudioPacket()
         : data{},
           addIndex{0},

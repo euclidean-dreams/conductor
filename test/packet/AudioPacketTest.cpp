@@ -14,6 +14,13 @@ protected:
     }
 };
 
+TEST_F(AudioPacketTest, From) {
+    AudioPacket audioPacket{};
+    Packet &packet = audioPacket;
+    auto &result = AudioPacket::from(packet);
+    EXPECT_EQ(&result, &audioPacket);
+}
+
 TEST_F(AudioPacketTest, AddSample) {
     AudioPacket audioPacket{};
     audioPacket.addSample(0.0f);

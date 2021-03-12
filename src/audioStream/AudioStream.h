@@ -2,8 +2,8 @@
 #define CONDUCTOR_AUDIOSTREAM_H
 
 #include <memory>
-#include <vector>
 #include <NonCopyable.h>
+#include "packet/AudioPacket.h"
 
 namespace conductor {
 
@@ -15,7 +15,7 @@ public:
 
     virtual bool nextPacketIsReady() const = 0;
 
-    virtual std::unique_ptr<std::vector<float>> getNextPacket() = 0;
+    virtual std::unique_ptr<AudioPacket> getNextPacket() = 0;
 };
 
 }
