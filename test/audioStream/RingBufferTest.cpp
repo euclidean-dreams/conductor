@@ -10,8 +10,8 @@ protected:
     void static nextPacketMatchesExpected(RingBuffer &ringBuffer, float *expected) {
         ASSERT_TRUE(ringBuffer.nextPacketIsReady());
         auto packet = ringBuffer.getNextPacket();
-        for (int i = 0; i < ringBuffer.getPacketSize(); i++) {
-            ASSERT_FLOAT_EQ((*packet)[i], expected[i]);
+        for (int index = 0; index < packet->size(); index++) {
+            ASSERT_FLOAT_EQ(packet->getSample(index), expected[index]);
         }
     }
 };

@@ -1,22 +1,23 @@
 #ifndef CONDUCTOR_AUDIOPACKET_H
 #define CONDUCTOR_AUDIOPACKET_H
 
-#include <array>
-#include "Config.h"
+#include <stdexcept>
+#include <vector>
 #include "packet/Packet.h"
 
 namespace conductor {
 
 class AudioPacket : public Packet {
 private:
-    std::array<float, AUDIO_PACKET_SIZE> data;
+    std::vector<float> data;
+    int maxSize;
     int addIndex;
     bool finalized;
 
 public:
     static const AudioPacket &from(const Packet &packet);
 
-    AudioPacket();
+    explicit AudioPacket(int size);
 
     void addSample(float sample);
 

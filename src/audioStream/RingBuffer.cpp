@@ -21,7 +21,7 @@ void RingBuffer::addSamples(const float *samples, unsigned long count) {
 }
 
 std::unique_ptr<AudioPacket> RingBuffer::getNextPacket() {
-    auto packet = std::make_unique<AudioPacket>();
+    auto packet = std::make_unique<AudioPacket>(packetSize);
     for (int i = 0; i < packetSize; i++) {
         packet->addSample(*readIterator);
         readIterator++;

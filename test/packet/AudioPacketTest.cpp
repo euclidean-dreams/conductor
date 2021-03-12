@@ -6,7 +6,7 @@ namespace conductor {
 class AudioPacketTest : public testing::Test {
 protected:
     static inline std::unique_ptr<AudioPacket> createFinalizedAudioPacket() {
-        auto audioPacket = std::make_unique<AudioPacket>();
+        auto audioPacket = std::make_unique<AudioPacket>(10);
         for (int i = 0; i < audioPacket->size(); i++) {
             audioPacket->addSample(static_cast<float>(i));
         }
@@ -15,14 +15,14 @@ protected:
 };
 
 TEST_F(AudioPacketTest, From) {
-    AudioPacket audioPacket{};
+    AudioPacket audioPacket{10};
     Packet &packet = audioPacket;
     auto &result = AudioPacket::from(packet);
     EXPECT_EQ(&result, &audioPacket);
 }
 
 TEST_F(AudioPacketTest, AddSample) {
-    AudioPacket audioPacket{};
+    AudioPacket audioPacket{10};
     audioPacket.addSample(0.0f);
 }
 
@@ -44,7 +44,7 @@ TEST_F(AudioPacketTest, GetSampleOutOfRange) {
 }
 
 TEST_F(AudioPacketTest, GetSampleWhileNotFinalized) {
-    AudioPacket audioPacket{};
+    AudioPacket audioPacket{10};
     EXPECT_THROW(audioPacket.getSample(0), std::runtime_error);
 }
 
