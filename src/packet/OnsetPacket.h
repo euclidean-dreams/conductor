@@ -19,6 +19,8 @@ public:
     OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMethod method, uint64_t sampleTimestamp);
 
     std::unique_ptr<zmq::multipart_t> serialize() const override;
+
+    uint64_t getSampleTimestamp() const;
 };
 
 }

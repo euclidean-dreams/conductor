@@ -20,4 +20,8 @@ std::unique_ptr<zmq::multipart_t> OnsetPacket::serialize() const {
     return std::make_unique<zmq::multipart_t>(builder.GetBufferPointer(), builder.GetSize());
 }
 
+uint64_t OnsetPacket::getSampleTimestamp() const {
+    return sampleTimestamp;
+}
+
 }
