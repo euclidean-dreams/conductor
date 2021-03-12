@@ -1,10 +1,7 @@
 #ifndef CONDUCTOR_ONSETPROCESSOR_H
 #define CONDUCTOR_ONSETPROCESSOR_H
 
-//#include <map>
 #include <aubio/aubio.h>
-//#include <zmq.hpp>
-//#include <spdlog/spdlog.h>
 #include <Time.h>
 #include <NetworkSocket.h>
 #include <Onset_generated.h>
