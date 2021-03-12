@@ -6,7 +6,6 @@
 #include <NetworkSocket.h>
 #include <Onset_generated.h>
 #include <OnsetProcessorParameters_generated.h>
-#include <AudioPacket_generated.h>
 #include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/AudioPacket.h"

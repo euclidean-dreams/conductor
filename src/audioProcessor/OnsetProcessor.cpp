@@ -52,7 +52,7 @@ void OnsetProcessor::process() {
     if (onsetDelay > 0) {
         auto earliestTimestamp = AudioPacket::from(*(*packets)[0]).getTimestamp();
         auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, earliestTimestamp);
-        auto packet = std::make_unique<OnsetPacket>(onsetTimestamp, method);
+        auto packet = std::make_unique<OnsetPacket>(onsetTimestamp, method, earliestTimestamp);
         output->sendPacket(move(packet));
     }
     input->concludePacketUse(move(packets));

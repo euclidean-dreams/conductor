@@ -18,9 +18,9 @@ constexpr int AUDIO_PACKET_SIZE = PROCESSOR_HOP_SIZE;
 constexpr int RING_BUFFER_SIZE_MULTIPLIER = 16;
 
 // audio source
-constexpr int AUDIO_STREAM_SOURCE_WAKE_INTERVAL = 50;
-constexpr int AUDIO_SINK_WAKE_INTERVAL = 50;
-constexpr int PACKET_SPOUT_WAKE_INTERVAL = 50;
+constexpr int AUDIO_STREAM_SOURCE_WAKE_INTERVAL = 100;
+constexpr int AUDIO_SINK_WAKE_INTERVAL = 100;
+constexpr int PACKET_SPOUT_WAKE_INTERVAL = 100;
 
 // onset
 constexpr smpl_t DEFAULT_ONSET_THRESHOLD = 0.3;

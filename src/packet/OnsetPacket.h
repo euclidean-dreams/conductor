@@ -11,11 +11,12 @@ class OnsetPacket : public Packet {
 private:
     uint64_t timestamp;
     ImpresarioSerialization::OnsetMethod method;
+    uint64_t sampleTimestamp;
 
 public:
     static const OnsetPacket &from(const Packet &packet);
 
-    OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMethod method);
+    OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMethod method, uint64_t sampleTimestamp);
 
     std::unique_ptr<zmq::multipart_t> serialize() const override;
 };
