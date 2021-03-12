@@ -2,26 +2,12 @@
 
 namespace conductor {
 
-std::unique_ptr<OnsetProcessor> OnsetProcessor::create(zmq::context_t &context, const std::string &parameterEndpoint,
-                                                       const std::string &inputEndpoint,
-                                                       const std::string &outputEndpoint,
-                                                       ImpresarioSerialization::OnsetMethod method) {
-    auto input = std::make_unique<impresarioUtils::NetworkSocket>(context, inputEndpoint, zmq::socket_type::sub, false);
-    input->setSubscriptionFilter("");
-    auto output = std::make_unique<impresarioUtils::NetworkSocket>(context, outputEndpoint, zmq::socket_type::push,
-                                                                   false);
-    auto parameterSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, parameterEndpoint,
-                                                                            zmq::socket_type::sub, false);
-    parameterSocket->setSubscriptionFilter("");
-    return std::make_unique<OnsetProcessor>(move(input), move(output), move(parameterSocket), method);
-}
-
-OnsetProcessor::OnsetProcessor(std::unique_ptr<impresarioUtils::NetworkSocket> inputSocket,
-                               std::unique_ptr<impresarioUtils::NetworkSocket> outputSocket,
+OnsetProcessor::OnsetProcessor(std::unique_ptr<PacketSpout> input,
+                               std::shared_ptr<PacketConduit> output,
                                std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                                ImpresarioSerialization::OnsetMethod method)
-        : inputSocket{move(inputSocket)},
-          outputSocket{move(outputSocket)},
+        : input{move(input)},
+          output{move(output)},
           parameterSocket{move(parameterSocket)},
           method{method},
           onsetAlgorithm{
@@ -61,18 +47,24 @@ void OnsetProcessor::setup() {
 
 void OnsetProcessor::process() {
     updateAlgorithmParameters();
-    auto message = inputSocket->receive()->pop();
-    auto audioPacket = ImpresarioSerialization::GetAudioPacket(message.data());
-    auto onsetDelay = determineOnsetDelay(audioPacket->samples());
+    auto packets = input->getPackets(1);
+    auto onsetDelay = determineOnsetDelay(*packets);
     if (onsetDelay > 0) {
-        auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, audioPacket->timestamp());
-        sendOnset(onsetTimestamp);
+        auto earliestTimestamp = AudioPacket::from(*(*packets)[0]).getTimestamp();
+        auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, earliestTimestamp);
+        auto packet = std::make_unique<OnsetPacket>(onsetTimestamp, method);
+        output->sendPacket(move(packet));
     }
+    input->concludePacketUse(move(packets));
 }
 
-uint64_t OnsetProcessor::determineOnsetDelay(const flatbuffers::Vector<float> *samples) {
-    for (int i = 0; i < samples->size(); i++) {
-        onsetInput->data[i] = (*samples)[i];
+uint64_t OnsetProcessor::determineOnsetDelay(std::vector<std::shared_ptr<const Packet>> &packets) {
+    auto indexOffset = 0;
+    for (auto &packet: packets) {
+        auto &audioPacket = AudioPacket::from(*packet);
+        for (int index = indexOffset; index < audioPacket.size() + indexOffset; index++) {
+            onsetInput->data[index] = audioPacket.getSample(index);
+        }
     }
     aubio_onset_do(onsetAlgorithm, onsetInput, onsetResultWrapper);
     auto onsetDelay = static_cast<uint64_t>(aubio_onset_get_last_ms(onsetAlgorithm) * 1000);
@@ -88,14 +80,6 @@ uint64_t OnsetProcessor::determineOnsetTimestamp(uint64_t onsetDelay, uint64_t a
     } else {
         return 0;
     }
-}
-
-void OnsetProcessor::sendOnset(uint64_t onsetTimestamp) {
-    flatbuffers::FlatBufferBuilder builder{};
-    auto onset = CreateOnset(builder, onsetTimestamp, method);
-    builder.Finish(onset);
-    zmq::multipart_t message{builder.GetBufferPointer(), builder.GetSize()};
-    outputSocket->send(message);
 }
 
 bool OnsetProcessor::shouldContinue() {

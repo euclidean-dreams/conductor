@@ -10,8 +10,13 @@ AudioPacket::AudioPacket(int size)
         : data{},
           maxSize{size},
           addIndex{0},
-          finalized{false} {
+          finalized{false},
+          timestamp{impresarioUtils::getCurrentTime()} {
     data.reserve(maxSize);
+}
+
+std::unique_ptr<zmq::multipart_t> AudioPacket::serialize() const {
+    throw NotSerializableException();
 }
 
 void AudioPacket::addSample(float sample) {
@@ -37,6 +42,10 @@ float AudioPacket::getSample(int index) const {
 
 int AudioPacket::size() const {
     return maxSize;
+}
+
+uint64_t AudioPacket::getTimestamp() const {
+    return timestamp;
 }
 
 }

@@ -38,11 +38,14 @@ set(
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
+        src/packet/PacketConduit.cpp src/packet/PacketConduit.h
+        src/packet/PacketSpout.cpp src/packet/PacketSpout.h
+
         src/packet/Packet.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
-        src/packet/PacketPublisher.cpp src/packet/PacketPublisher.h
-        src/packet/PacketSubscriber.cpp src/packet/PacketSubscriber.h
+        src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
 
+        src/packet/NotSerializableException.h
 )
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
@@ -54,12 +57,13 @@ set(
         test/audioStream/RingBufferTest.cpp
         test/packet/PacketMock.h
         test/packet/AudioPacketTest.cpp
-        test/packet/PacketPublisherTest.cpp
+        test/packet/PacketConduitTest.cpp
 
 )
 list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)
+target_link_libraries(test-conductor PRIVATE gmock)
 
 # finalize
 find_package(cppzmq)

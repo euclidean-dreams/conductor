@@ -1,22 +1,22 @@
 #ifndef CONDUCTOR_AUDIOPROCESSORSINK_H
 #define CONDUCTOR_AUDIOPROCESSORSINK_H
 
+#include <thread>
 #include <zmq.hpp>
 #include <NetworkSocket.h>
-#include <NetworkProxy.h>
 #include "audioProcessor/AudioProcessor.h"
+#include "packet/PacketSpout.h"
 
 namespace conductor {
 
 class AudioProcessorSink : public AudioProcessor {
 private:
-    std::unique_ptr<impresarioUtils::NetworkProxy> proxy;
+    std::unique_ptr<PacketSpout> input;
+    std::unique_ptr<impresarioUtils::NetworkSocket> output;
 
 public:
-    static std::unique_ptr<AudioProcessorSink> create(zmq::context_t &context, const std::string &inputEndpoint,
-                                                      const std::string &outputEndpoint);
-
-    explicit AudioProcessorSink(std::unique_ptr<impresarioUtils::NetworkProxy> proxy);
+    explicit AudioProcessorSink(std::unique_ptr<PacketSpout> input,
+                                std::unique_ptr<impresarioUtils::NetworkSocket> output);
 
     void setup() override;
 

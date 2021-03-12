@@ -10,16 +10,14 @@
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/OnsetProcessor.h"
 #include "audioStream/AudioStream.h"
-#include "packet/PacketPublisher.h"
+#include "packet/PacketConduit.h"
+#include "packet/PacketConduitManager.h"
 
 namespace conductor {
 
 class AudioProcessorSuite : impresarioUtils::NonCopyable {
 private:
     std::vector<std::unique_ptr<AudioProcessor>> audioProcessors;
-    int endpointCounter;
-
-    std::string generateInprocEndpoint();
 
 public:
     AudioProcessorSuite(zmq::context_t &context, AudioStream &audioStream);

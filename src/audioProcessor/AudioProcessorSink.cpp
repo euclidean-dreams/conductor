@@ -2,18 +2,10 @@
 
 namespace conductor {
 
-std::unique_ptr<AudioProcessorSink> AudioProcessorSink::create(zmq::context_t &context,
-                                                               const std::string &inputEndpoint,
-                                                               const std::string &outputEndpoint) {
-    auto input = std::make_unique<impresarioUtils::NetworkSocket>(context, inputEndpoint, zmq::socket_type::pull, true);
-    auto output = std::make_unique<impresarioUtils::NetworkSocket>(context, outputEndpoint, zmq::socket_type::pub,
-                                                                   true);
-    auto proxy = std::make_unique<impresarioUtils::NetworkProxy>(move(input), move(output));
-    return std::make_unique<AudioProcessorSink>(move(proxy));
-}
-
-AudioProcessorSink::AudioProcessorSink(std::unique_ptr<impresarioUtils::NetworkProxy> proxy)
-        : proxy{move(proxy)} {
+AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketSpout> input,
+                                       std::unique_ptr<impresarioUtils::NetworkSocket> output)
+        : input{move(input)},
+          output{move(output)} {
 
 }
 
@@ -22,7 +14,15 @@ void AudioProcessorSink::setup() {
 }
 
 void AudioProcessorSink::process() {
-    proxy->start();
+    auto packets = input->getAllAvailablePackets();
+    if (packets != nullptr) {
+        for (auto &packet: *packets) {
+            auto message = packet->serialize();
+            output->send(*message);
+        }
+        input->concludePacketUse(move(packets));
+    }
+    std::this_thread::sleep_for(std::chrono::microseconds(AUDIO_SINK_WAKE_INTERVAL));
 }
 
 bool AudioProcessorSink::shouldContinue() {
