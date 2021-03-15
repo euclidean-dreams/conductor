@@ -5,7 +5,8 @@ namespace conductor {
 AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketSpout> input,
                                        std::unique_ptr<impresarioUtils::NetworkSocket> output)
         : input{move(input)},
-          output{move(output)} {
+          output{move(output)},
+          logger{spdlog::get(static_cast<std::string>(LOGGER_NAME))} {
 
 }
 
@@ -14,15 +15,13 @@ void AudioProcessorSink::setup() {
 }
 
 void AudioProcessorSink::process() {
-    auto packets = input->getAllAvailablePackets();
-    if (packets != nullptr) {
-        for (auto &packet: *packets) {
-            auto message = packet->serialize();
-            output->send(*message);
-        }
-        input->concludePacketUse(move(packets));
-    }
-    std::this_thread::sleep_for(std::chrono::microseconds(AUDIO_SINK_WAKE_INTERVAL));
+    auto packets = input->getPackets(1);
+    auto &packet = packets->getPacket(0);
+    auto &onset = OnsetPacket::from(packet);
+    logger->info("latency {}", impresarioUtils::getElapsedTime(onset.getSampleTimestamp()));
+    auto message = packet.serialize();
+    output->send(*message);
+    packets->concludeUse();
 }
 
 bool AudioProcessorSink::shouldContinue() {

@@ -9,11 +9,8 @@ AudioStreamSource::AudioStreamSource(AudioStream &audioStream,
 }
 
 void AudioStreamSource::process() {
-    if (audioStream.nextPacketIsReady()) {
-        output->sendPacket(audioStream.getNextPacket());
-    } else {
-        std::this_thread::sleep_for(std::chrono::microseconds(AUDIO_STREAM_SOURCE_WAKE_INTERVAL));
-    }
+    audioStream.waitUntilNextPacketIsReady();
+    output->sendPacket(audioStream.getNextPacket());
 }
 
 bool AudioStreamSource::shouldContinue() {

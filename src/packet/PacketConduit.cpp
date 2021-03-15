@@ -4,6 +4,7 @@ namespace conductor {
 
 PacketConduit::PacketConduit()
         : mutex{},
+          newPacketAddedExpectant{},
           packets{},
           spoutIterators{} {
 
@@ -22,7 +23,6 @@ void PacketConduit::validatePacketsAvailable(int spoutId, int packetCount) {
 }
 
 void PacketConduit::clean() {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
     bool shouldRemovePacket = true;
     while (shouldRemovePacket) {
         for (auto &spoutIterator: spoutIterators) {
@@ -37,23 +37,23 @@ void PacketConduit::clean() {
 }
 
 void PacketConduit::sendPacket(std::unique_ptr<const Packet> packet) {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
+    std::lock_guard<std::mutex> lock{mutex};
     packets.push_back(move(packet));
     for (auto &spoutIterator: spoutIterators) {
         if (spoutIterator == packets.cend()) {
             spoutIterator--;
         }
     }
+    newPacketAddedExpectant.notify_all();
 }
 
 int PacketConduit::registerSpout() {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
+    std::lock_guard<std::mutex> lock{mutex};
     spoutIterators.push_back(packets.cbegin());
     return static_cast<int>(spoutIterators.size() - 1);
 }
 
 int PacketConduit::availablePackets(int spoutId) {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
     validateSpoutId(spoutId);
     auto copiedIterator{spoutIterators[spoutId]};
     auto packetCount = 0;
@@ -64,15 +64,21 @@ int PacketConduit::availablePackets(int spoutId) {
     return packetCount;
 }
 
-std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> PacketConduit::getPackets(int spoutId,
-                                                                                      int packetCount) {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
+void PacketConduit::waitForAvailablePackets(int spoutId, int packetCount) {
+    std::unique_lock<std::mutex> lock{mutex};
+    while (availablePackets(spoutId) < packetCount) {
+        newPacketAddedExpectant.wait(lock);
+    }
+}
+
+std::unique_ptr<PacketCollection> PacketConduit::getPackets(int spoutId, int packetCount,
+                                                            PacketCollectionManager &packetCollectionManager) {
     validateSpoutId(spoutId);
     validatePacketsAvailable(spoutId, packetCount);
-    auto result = std::make_unique<std::vector<std::shared_ptr<const Packet>>>();
+    auto result = std::make_unique<PacketCollection>(packetCollectionManager);
     auto copiedIterator{spoutIterators[spoutId]};
     while (packetCount > 0) {
-        result->push_back(*copiedIterator);
+        result->addPacket(*copiedIterator);
         copiedIterator++;
         packetCount--;
     }
@@ -80,7 +86,7 @@ std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> PacketConduit::getPa
 }
 
 void PacketConduit::concludePacketUse(int spoutId, int packetCount) {
-    std::lock_guard<std::recursive_mutex> lock{mutex};
+    std::lock_guard<std::mutex> lock{mutex};
     validateSpoutId(spoutId);
     validatePacketsAvailable(spoutId, packetCount);
     auto &spoutIterator = spoutIterators[spoutId];

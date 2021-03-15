@@ -11,9 +11,9 @@ class AudioStream : impresarioUtils::NonCopyable {
 public:
     virtual ~AudioStream() = default;
 
-    virtual int getPacketSize() const = 0;
-
     virtual bool nextPacketIsReady() const = 0;
+
+    virtual void waitUntilNextPacketIsReady() = 0;
 
     virtual std::unique_ptr<AudioPacket> getNextPacket() = 0;
 };

@@ -3,7 +3,9 @@
 namespace conductor {
 
 RingBuffer::RingBuffer(int packetSize, int bufferMultiplier)
-        : packetSize{packetSize},
+        : mutex{},
+          packetAddedExpectant{},
+          packetSize{packetSize},
           bufferSize{packetSize * bufferMultiplier},
           internalBuffer(bufferSize),
           readIterator{internalBuffer.cbegin()},
@@ -17,6 +19,18 @@ void RingBuffer::addSamples(const float *samples, unsigned long count) {
         }
         *writeIterator = samples[i];
         writeIterator++;
+    }
+    if (nextPacketIsReady()) {
+        packetAddedExpectant.notify_all();
+    }
+}
+
+bool RingBuffer::nextPacketIsReady() const {
+    if (readIterator + packetSize <= writeIterator
+        || (writeIterator < readIterator && writeIterator >= internalBuffer.begin() + packetSize)) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -32,17 +46,11 @@ std::unique_ptr<AudioPacket> RingBuffer::getNextPacket() {
     return packet;
 }
 
-bool RingBuffer::nextPacketIsReady() const {
-    if (readIterator + packetSize <= writeIterator
-        || (writeIterator < readIterator && writeIterator >= internalBuffer.begin() + packetSize)) {
-        return true;
-    } else {
-        return false;
+void RingBuffer::waitUntilNextPacketIsReady() {
+    std::unique_lock<std::mutex> lock{mutex};
+    while (!nextPacketIsReady()) {
+        packetAddedExpectant.wait(lock);
     }
-}
-
-int RingBuffer::getPacketSize() const {
-    return packetSize;
 }
 
 }

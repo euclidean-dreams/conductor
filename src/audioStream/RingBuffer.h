@@ -1,6 +1,8 @@
 #ifndef CONDUCTOR_RINGBUFFER_H
 #define CONDUCTOR_RINGBUFFER_H
 
+#include <mutex>
+#include <condition_variable>
 #include <memory>
 #include <vector>
 #include "audioStream/AudioStream.h"
@@ -9,6 +11,8 @@ namespace conductor {
 
 class RingBuffer : public AudioStream {
 private:
+    std::mutex mutex;
+    std::condition_variable packetAddedExpectant;
     int packetSize;
     int bufferSize;
     std::vector<float> internalBuffer;
@@ -20,9 +24,9 @@ public:
 
     void addSamples(const float *samples, unsigned long count);
 
-    int getPacketSize() const override;
-
     bool nextPacketIsReady() const override;
+
+    void waitUntilNextPacketIsReady() override;
 
     std::unique_ptr<AudioPacket> getNextPacket() override;
 };

@@ -2,12 +2,12 @@
 #define CONDUCTOR_PACKETSPOUT_H
 
 #include <thread>
-#include "Config.h"
 #include "packet/PacketConduit.h"
+#include "packet/PacketCollectionManager.h"
 
 namespace conductor {
 
-class PacketSpout {
+class PacketSpout : public PacketCollectionManager {
 private:
     PacketConduit &packetConduit;
     int spoutId;
@@ -15,11 +15,9 @@ private:
 public:
     explicit PacketSpout(PacketConduit &packetConduit);
 
-    std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getPackets(int packetCount);
+    std::unique_ptr<PacketCollection> getPackets(int packetCount);
 
-    std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getAllAvailablePackets();
-
-    void concludePacketUse(std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> packets);
+    void concludePacketCollectionUse(int size) override;
 };
 
 }

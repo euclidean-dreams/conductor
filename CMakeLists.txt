@@ -3,6 +3,9 @@ project(conductor VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+
 add_compile_options(-Wno-psabi)
 
 include(lib/cmake-utils/dependency-integrator.cmake)
@@ -39,7 +42,9 @@ set(
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
 
         src/packet/PacketConduit.cpp src/packet/PacketConduit.h
+        src/packet/PacketCollectionManager.h
         src/packet/PacketSpout.cpp src/packet/PacketSpout.h
+        src/packet/PacketCollection.cpp src/packet/PacketCollection.h
 
         src/packet/Packet.h
         src/packet/NotSerializableException.h
@@ -56,6 +61,7 @@ set(
 
         test/audioStream/RingBufferTest.cpp
         test/packet/PacketMock.h
+        test/packet/PacketCollectionManagerMock.h
         test/packet/AudioPacketTest.cpp
         test/packet/PacketConduitTest.cpp
 

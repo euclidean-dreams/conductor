@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "packet/PacketConduit.h"
 #include "PacketMock.h"
+#include "PacketCollectionManagerMock.h"
 
 namespace conductor {
 
@@ -64,28 +65,31 @@ TEST_F(PacketConduitTest, AvailablePacketsMultiple) {
 
 TEST_F(PacketConduitTest, GetPacketsWithInvalidSpoutId) {
     PacketConduit packetConduit{};
-    EXPECT_THROW(packetConduit.getPackets(0, 1), std::out_of_range);
-    EXPECT_THROW(packetConduit.getPackets(-5, 1), std::out_of_range);
-    EXPECT_THROW(packetConduit.getPackets(12, 1), std::out_of_range);
+    PacketCollectionManagerMock packetCollectionManagerMock{};
+    EXPECT_THROW(packetConduit.getPackets(0, 1, packetCollectionManagerMock), std::out_of_range);
+    EXPECT_THROW(packetConduit.getPackets(-5, 1, packetCollectionManagerMock), std::out_of_range);
+    EXPECT_THROW(packetConduit.getPackets(12, 1, packetCollectionManagerMock), std::out_of_range);
 }
 
 TEST_F(PacketConduitTest, GetPacketsWithInvalidPacketCount) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId = packetConduit.registerSpout();
-    EXPECT_THROW(packetConduit.getPackets(spoutId, 0), std::out_of_range);
-    EXPECT_THROW(packetConduit.getPackets(spoutId, -5), std::out_of_range);
-    EXPECT_THROW(packetConduit.getPackets(spoutId, 100), std::out_of_range);
+    EXPECT_THROW(packetConduit.getPackets(spoutId, 0, packetCollectionManagerMock), std::out_of_range);
+    EXPECT_THROW(packetConduit.getPackets(spoutId, -5, packetCollectionManagerMock), std::out_of_range);
+    EXPECT_THROW(packetConduit.getPackets(spoutId, 100, packetCollectionManagerMock), std::out_of_range);
 }
 
 TEST_F(PacketConduitTest, GetPacketsSingle) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId = packetConduit.registerSpout();
 
     auto packet = std::make_unique<PacketMock>();
     packetConduit.sendPacket(move(packet));
     EXPECT_EQ(packetConduit.availablePackets(spoutId), 1);
 
-    packetConduit.getPackets(spoutId, 1);
+    packetConduit.getPackets(spoutId, 1, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId, 1);
 
     EXPECT_EQ(packetConduit.availablePackets(spoutId), 0);
@@ -94,6 +98,7 @@ TEST_F(PacketConduitTest, GetPacketsSingle) {
 TEST_F(PacketConduitTest, GetPacketsMultiple) {
     auto packetCount = 5;
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId = packetConduit.registerSpout();
 
     for (int i = 0; i < packetCount; i++) {
@@ -102,7 +107,7 @@ TEST_F(PacketConduitTest, GetPacketsMultiple) {
     }
     EXPECT_EQ(packetConduit.availablePackets(spoutId), packetCount);
 
-    packetConduit.getPackets(spoutId, packetCount);
+    packetConduit.getPackets(spoutId, packetCount, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId, packetCount);
     EXPECT_EQ(packetConduit.availablePackets(spoutId), 0);
 }
@@ -124,12 +129,13 @@ TEST_F(PacketConduitTest, ConcludePacketUseWithInvalidPacketCount) {
 
 TEST_F(PacketConduitTest, CleanSinglePacket) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId0 = packetConduit.registerSpout();
 
     auto packet = std::make_unique<PacketMock>();
     packetConduit.sendPacket(move(packet));
 
-    packetConduit.getPackets(spoutId0, 1);
+    packetConduit.getPackets(spoutId0, 1, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId0, 1);
 
     auto spoutId1 = packetConduit.registerSpout();
@@ -138,6 +144,7 @@ TEST_F(PacketConduitTest, CleanSinglePacket) {
 
 TEST_F(PacketConduitTest, CleanMultiplePackets) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId0 = packetConduit.registerSpout();
 
     auto initialPacketCount = 5;
@@ -146,7 +153,7 @@ TEST_F(PacketConduitTest, CleanMultiplePackets) {
         packetConduit.sendPacket(move(packet));
     }
 
-    packetConduit.getPackets(spoutId0, 3);
+    packetConduit.getPackets(spoutId0, 3, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId0, 3);
 
     auto spoutId1 = packetConduit.registerSpout();
@@ -155,6 +162,7 @@ TEST_F(PacketConduitTest, CleanMultiplePackets) {
 
 TEST_F(PacketConduitTest, CleanMultiplePacketsMultipleSpouts) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId0 = packetConduit.registerSpout();
     auto spoutId1 = packetConduit.registerSpout();
 
@@ -164,10 +172,10 @@ TEST_F(PacketConduitTest, CleanMultiplePacketsMultipleSpouts) {
         packetConduit.sendPacket(move(packet));
     }
 
-    packetConduit.getPackets(spoutId0, 4);
+    packetConduit.getPackets(spoutId0, 4, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId0, 4);
 
-    packetConduit.getPackets(spoutId1, 3);
+    packetConduit.getPackets(spoutId1, 3, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId1, 3);
 
     auto spoutId2 = packetConduit.registerSpout();
@@ -176,6 +184,7 @@ TEST_F(PacketConduitTest, CleanMultiplePacketsMultipleSpouts) {
 
 TEST_F(PacketConduitTest, MultipleSpoutsMultiplePackets) {
     PacketConduit packetConduit{};
+    PacketCollectionManagerMock packetCollectionManagerMock{};
     auto spoutId0 = packetConduit.registerSpout();
     auto spoutId1 = packetConduit.registerSpout();
 
@@ -187,22 +196,22 @@ TEST_F(PacketConduitTest, MultipleSpoutsMultiplePackets) {
     EXPECT_EQ(packetConduit.availablePackets(spoutId0), initialPacketCount);
     EXPECT_EQ(packetConduit.availablePackets(spoutId1), initialPacketCount);
 
-    packetConduit.getPackets(spoutId0, 2);
+    packetConduit.getPackets(spoutId0, 2, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId0, 2);
     EXPECT_EQ(packetConduit.availablePackets(spoutId0), 3);
     EXPECT_EQ(packetConduit.availablePackets(spoutId1), initialPacketCount);
 
-    packetConduit.getPackets(spoutId1, 4);
+    packetConduit.getPackets(spoutId1, 4, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId1, 4);
     EXPECT_EQ(packetConduit.availablePackets(spoutId0), 3);
     EXPECT_EQ(packetConduit.availablePackets(spoutId1), 1);
 
-    packetConduit.getPackets(spoutId1, 1);
+    packetConduit.getPackets(spoutId1, 1, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId1, 1);
     EXPECT_EQ(packetConduit.availablePackets(spoutId0), 3);
     EXPECT_EQ(packetConduit.availablePackets(spoutId1), 0);
 
-    packetConduit.getPackets(spoutId0, 3);
+    packetConduit.getPackets(spoutId0, 3, packetCollectionManagerMock);
     packetConduit.concludePacketUse(spoutId0, 3);
     EXPECT_EQ(packetConduit.availablePackets(spoutId0), 0);
     EXPECT_EQ(packetConduit.availablePackets(spoutId1), 0);

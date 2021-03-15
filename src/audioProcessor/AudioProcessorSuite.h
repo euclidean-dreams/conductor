@@ -11,7 +11,6 @@
 #include "audioProcessor/OnsetProcessor.h"
 #include "audioStream/AudioStream.h"
 #include "packet/PacketConduit.h"
-#include "packet/PacketConduitManager.h"
 
 namespace conductor {
 

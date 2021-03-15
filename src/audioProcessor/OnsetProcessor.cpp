@@ -50,15 +50,15 @@ void OnsetProcessor::process() {
     auto packets = input->getPackets(1);
     auto onsetDelay = determineOnsetDelay(*packets);
     if (onsetDelay > 0) {
-        auto earliestTimestamp = AudioPacket::from(*(*packets)[0]).getTimestamp();
+        auto earliestTimestamp = AudioPacket::from(packets->getPacket(0)).getTimestamp();
         auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, earliestTimestamp);
         auto packet = std::make_unique<OnsetPacket>(onsetTimestamp, method, earliestTimestamp);
         output->sendPacket(move(packet));
     }
-    input->concludePacketUse(move(packets));
+    packets->concludeUse();
 }
 
-uint64_t OnsetProcessor::determineOnsetDelay(std::vector<std::shared_ptr<const Packet>> &packets) {
+uint64_t OnsetProcessor::determineOnsetDelay(PacketCollection &packets) {
     auto indexOffset = 0;
     for (auto &packet: packets) {
         auto &audioPacket = AudioPacket::from(*packet);

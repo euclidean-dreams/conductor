@@ -27,7 +27,7 @@ private:
 
     void updateAlgorithmParameters();
 
-    uint64_t determineOnsetDelay(std::vector<std::shared_ptr<const Packet>> &packets);
+    uint64_t determineOnsetDelay(PacketCollection &packets);
 
     static uint64_t determineOnsetTimestamp(uint64_t onsetDelay, uint64_t audioPacketTimestamp);
 

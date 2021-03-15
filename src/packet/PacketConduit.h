@@ -2,17 +2,20 @@
 #define CONDUCTOR_PACKETCONDUIT_H
 
 #include <mutex>
+#include <condition_variable>
 #include <vector>
 #include <list>
 #include <memory>
 #include <NonCopyable.h>
 #include "packet/Packet.h"
+#include "packet/PacketCollection.h"
 
 namespace conductor {
 
 class PacketConduit : impresarioUtils::NonCopyable {
 private:
-    std::recursive_mutex mutex;
+    std::mutex mutex;
+    std::condition_variable newPacketAddedExpectant;
     std::list<std::shared_ptr<const Packet>> packets;
     std::vector<std::_List_const_iterator<std::shared_ptr<const Packet>>> spoutIterators;
 
@@ -31,7 +34,10 @@ public:
 
     int availablePackets(int spoutId);
 
-    std::unique_ptr<std::vector<std::shared_ptr<const Packet>>> getPackets(int spoutId, int packetCount);
+    void waitForAvailablePackets(int spoutId, int packetCount);
+
+    std::unique_ptr<PacketCollection> getPackets(int spoutId, int packetCount,
+                                                 PacketCollectionManager &packetCollectionManager);
 
     void concludePacketUse(int spoutId, int packetCount);
 };
