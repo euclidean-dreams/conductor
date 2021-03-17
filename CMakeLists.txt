@@ -24,8 +24,9 @@ set(
         src/Bootstrapper.cpp src/Bootstrapper.h
 
         src/audioStream/AudioStream.h
-        src/audioStream/AudioStreamManager.cpp src/audioStream/AudioStreamManager.h
+        src/audioStream/AudioInput.cpp src/audioStream/AudioInput.h
         src/audioStream/RingBuffer.cpp src/audioStream/RingBuffer.h
+        src/audioStream/AudioUtils.h src/audioStream/AudioUtils.cpp
 
         src/audioProcessor/AudioProcessor.h
         src/audioProcessor/AudioProcessorSuite.cpp src/audioProcessor/AudioProcessorSuite.h
@@ -43,8 +44,9 @@ set(
         src/packet/NotSerializableException.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
+        src/packet/PitchPacket.cpp src/packet/PitchPacket.h
 
-        src/packet/PitchPacket.cpp src/packet/PitchPacket.h)
+)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
