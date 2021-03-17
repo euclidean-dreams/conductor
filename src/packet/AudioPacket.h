@@ -22,7 +22,9 @@ public:
 
     explicit AudioPacket(int size);
 
-    std::unique_ptr<zmq::multipart_t> serialize() const override;
+    std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
+
+    ImpresarioSerialization::Identifier getIdentifier() const override;
 
     void addSample(float sample);
 

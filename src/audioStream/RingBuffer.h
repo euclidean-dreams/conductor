@@ -11,6 +11,8 @@ namespace conductor {
 
 class RingBuffer : public AudioStream {
 private:
+    inline static const int BUFFER_SIZE_MULTIPLIER = 16;
+
     std::mutex mutex;
     std::condition_variable packetAddedExpectant;
     int packetSize;
@@ -20,7 +22,7 @@ private:
     std::vector<float>::iterator writeIterator;
 
 public:
-    explicit RingBuffer(int packetSize, int bufferMultiplier);
+    explicit RingBuffer(int packetSize);
 
     void addSamples(const float *samples, unsigned long count);
 

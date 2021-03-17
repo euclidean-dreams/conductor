@@ -3,9 +3,6 @@ project(conductor VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-
 add_compile_options(-Wno-psabi)
 
 include(lib/cmake-utils/dependency-integrator.cmake)
@@ -17,11 +14,6 @@ integrate_cmake_dependency(
 integrate_cmake_dependency(
         NAME impresario-utils
         GIT_URL git@github.com:impresario-systems/impresario-utils.git
-        GIT_TAG origin/dev
-)
-integrate_cmake_dependency(
-        NAME impresario-serialization
-        GIT_URL git@github.com:impresario-systems/impresario-serialization.git
         GIT_TAG origin/dev
 )
 
@@ -40,6 +32,7 @@ set(
         src/audioProcessor/AudioStreamSource.cpp src/audioProcessor/AudioStreamSource.h
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
+        src/audioProcessor/PitchProcessor.cpp src/audioProcessor/PitchProcessor.h
 
         src/packet/PacketConduit.cpp src/packet/PacketConduit.h
         src/packet/PacketCollectionManager.h
@@ -51,7 +44,7 @@ set(
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
 
-)
+        src/packet/PitchPacket.cpp src/packet/PitchPacket.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -76,7 +69,6 @@ find_package(cppzmq)
 foreach (target IN LISTS TARGETS)
     target_include_directories(${target} PRIVATE src)
     target_link_libraries(${target} PRIVATE impresario-utils)
-    target_link_libraries(${target} PRIVATE impresario-serialization)
     target_link_libraries(${target} PRIVATE aubio)
     target_link_libraries(${target} PRIVATE portaudio)
     target_link_libraries(${target} PRIVATE cppzmq)

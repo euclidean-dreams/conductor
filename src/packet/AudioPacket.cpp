@@ -15,7 +15,11 @@ AudioPacket::AudioPacket(int size)
     data.reserve(maxSize);
 }
 
-std::unique_ptr<zmq::multipart_t> AudioPacket::serialize() const {
+std::unique_ptr<flatbuffers::FlatBufferBuilder> AudioPacket::serialize() const {
+    throw NotSerializableException();
+}
+
+ImpresarioSerialization::Identifier AudioPacket::getIdentifier() const {
     throw NotSerializableException();
 }
 

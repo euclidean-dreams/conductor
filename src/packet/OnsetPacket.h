@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <Onset_generated.h>
+#include "Config.h"
 #include "packet/Packet.h"
 
 namespace conductor {
@@ -18,7 +19,9 @@ public:
 
     OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMethod method, uint64_t sampleTimestamp);
 
-    std::unique_ptr<zmq::multipart_t> serialize() const override;
+    std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
+
+    ImpresarioSerialization::Identifier getIdentifier() const override;
 
     uint64_t getSampleTimestamp() const;
 };

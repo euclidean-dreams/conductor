@@ -17,7 +17,7 @@ private:
     static void throwOnError(PaError portAudioReturnCode);
 
 public:
-    AudioStreamManager(float sampleRate, int packetSize, int bufferSizeMultiplier);
+    AudioStreamManager(float sampleRate, int packetSize);
 
     ~AudioStreamManager();
 

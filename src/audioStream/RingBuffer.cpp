@@ -2,11 +2,11 @@
 
 namespace conductor {
 
-RingBuffer::RingBuffer(int packetSize, int bufferMultiplier)
+RingBuffer::RingBuffer(int packetSize)
         : mutex{},
           packetAddedExpectant{},
           packetSize{packetSize},
-          bufferSize{packetSize * bufferMultiplier},
+          bufferSize{packetSize * BUFFER_SIZE_MULTIPLIER},
           internalBuffer(bufferSize),
           readIterator{internalBuffer.cbegin()},
           writeIterator{internalBuffer.begin()} {

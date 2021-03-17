@@ -17,10 +17,8 @@ void AudioProcessorSink::setup() {
 void AudioProcessorSink::process() {
     auto packets = input->getPackets(1);
     auto &packet = packets->getPacket(0);
-    auto &onset = OnsetPacket::from(packet);
-    logger->info("latency {}", impresarioUtils::getElapsedTime(onset.getSampleTimestamp()));
-    auto message = packet.serialize();
-    output->send(*message);
+    auto message = packets->getPacket(0).serialize();
+    output->sendSerializedData(packet.getIdentifier(), *packet.serialize());
     packets->concludeUse();
 }
 

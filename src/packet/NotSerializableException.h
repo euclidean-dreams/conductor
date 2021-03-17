@@ -5,7 +5,9 @@ namespace conductor {
 
 class NotSerializableException : public std::logic_error {
 public:
-    NotSerializableException() : logic_error("packet is not serializable") {}
+    NotSerializableException() : logic_error(
+            "packet is not yet serializable, please create a corresponding flatbuffers implementation"
+    ) {}
 };
 
 }

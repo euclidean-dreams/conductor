@@ -11,14 +11,15 @@ OnsetProcessor::OnsetProcessor(std::unique_ptr<PacketSpout> input,
           parameterSocket{move(parameterSocket)},
           method{method},
           onsetAlgorithm{
-                  new_aubio_onset(EnumNameOnsetMethod(method), PROCESSOR_BUFFER_SIZE, PROCESSOR_HOP_SIZE, SAMPLE_RATE)
+                  new_aubio_onset(ImpresarioSerialization::EnumNameOnsetMethod(method),
+                                  PROCESSOR_BUFFER_SIZE, PROCESSOR_HOP_SIZE, SAMPLE_RATE)
           },
           onsetInput{new_fvec(AUDIO_PACKET_SIZE)},
           onsetResultWrapper{new_fvec(1)} {
-    aubio_onset_set_threshold(onsetAlgorithm, DEFAULT_ONSET_THRESHOLD);
-    aubio_onset_set_minioi_ms(onsetAlgorithm, DEFAULT_ONSET_MINIOI_MS);
-    aubio_onset_set_silence(onsetAlgorithm, DEFAULT_ONSET_SILENCE);
-    aubio_onset_set_awhitening(onsetAlgorithm, DEFAULT_ONSET_ADAPTIVE_WHITENING);
+    aubio_onset_set_threshold(onsetAlgorithm, DEFAULT_THRESHOLD);
+    aubio_onset_set_minioi_ms(onsetAlgorithm, DEFAULT_MINIOI_MS);
+    aubio_onset_set_silence(onsetAlgorithm, DEFAULT_SILENCE);
+    aubio_onset_set_awhitening(onsetAlgorithm, DEFAULT_ADAPTIVE_WHITENING);
     aubio_onset_set_delay(onsetAlgorithm, 0);
 }
 
@@ -29,9 +30,9 @@ OnsetProcessor::~OnsetProcessor() {
 }
 
 void OnsetProcessor::updateAlgorithmParameters() {
-    auto parameters = parameterSocket->receiveBuffer(zmq::recv_flags::dontwait);
+    auto parameters = parameterSocket->receiveSerializedData(zmq::recv_flags::dontwait);
     if (parameters != nullptr) {
-        auto onsetParameters = ImpresarioSerialization::GetOnsetProcessorParameters(parameters.get());
+        auto onsetParameters = ImpresarioSerialization::GetOnsetProcessorParameters(parameters->getBuffer());
         if (onsetParameters->method() == method) {
             aubio_onset_set_threshold(onsetAlgorithm, onsetParameters->threshold());
             aubio_onset_set_minioi_ms(onsetAlgorithm, onsetParameters->minioi_ms());
@@ -52,8 +53,8 @@ void OnsetProcessor::process() {
     if (onsetDelay > 0) {
         auto earliestTimestamp = AudioPacket::from(packets->getPacket(0)).getTimestamp();
         auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, earliestTimestamp);
-        auto packet = std::make_unique<OnsetPacket>(onsetTimestamp, method, earliestTimestamp);
-        output->sendPacket(move(packet));
+        auto resultPacket = std::make_unique<OnsetPacket>(onsetTimestamp, method, earliestTimestamp);
+        output->sendPacket(move(resultPacket));
     }
     packets->concludeUse();
 }

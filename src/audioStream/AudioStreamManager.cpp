@@ -2,9 +2,9 @@
 
 namespace conductor {
 
-AudioStreamManager::AudioStreamManager(float sampleRate, int packetSize, int bufferSizeMultiplier)
+AudioStreamManager::AudioStreamManager(float sampleRate, int packetSize)
         : stream{},
-          ringBuffer{packetSize, bufferSizeMultiplier} {
+          ringBuffer{packetSize} {
     throwOnError(Pa_Initialize());
     throwOnError(Pa_OpenDefaultStream(
             &stream,

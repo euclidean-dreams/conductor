@@ -13,15 +13,18 @@ OnsetPacket::OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMetho
 
 }
 
-std::unique_ptr<zmq::multipart_t> OnsetPacket::serialize() const {
-    flatbuffers::FlatBufferBuilder builder{};
-    auto onset = CreateOnset(builder, timestamp, method, sampleTimestamp);
-    builder.Finish(onset);
-    return std::make_unique<zmq::multipart_t>(builder.GetBufferPointer(), builder.GetSize());
+std::unique_ptr<flatbuffers::FlatBufferBuilder> OnsetPacket::serialize() const {
+    auto builder = std::make_unique<flatbuffers::FlatBufferBuilder>();
+    auto serializedOnset = ImpresarioSerialization::CreateOnset(*builder, timestamp, method, sampleTimestamp);
+    builder->Finish(serializedOnset);
+    return builder;
+}
+
+ImpresarioSerialization::Identifier OnsetPacket::getIdentifier() const {
+    return ImpresarioSerialization::Identifier::onset;
 }
 
 uint64_t OnsetPacket::getSampleTimestamp() const {
     return sampleTimestamp;
 }
-
 }

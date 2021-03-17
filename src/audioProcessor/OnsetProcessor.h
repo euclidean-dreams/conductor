@@ -17,6 +17,11 @@ namespace conductor {
 
 class OnsetProcessor : public AudioProcessor {
 private:
+    inline static const smpl_t DEFAULT_THRESHOLD = 0.3;
+    inline static const smpl_t DEFAULT_SILENCE = -60.0;
+    inline static const smpl_t DEFAULT_MINIOI_MS = 1;
+    inline static const bool DEFAULT_ADAPTIVE_WHITENING = true;
+
     std::unique_ptr<PacketSpout> input;
     std::shared_ptr<PacketConduit> output;
     std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket;
