@@ -4,26 +4,24 @@
 #include <cstdint>
 #include <Onset_generated.h>
 #include "Config.h"
-#include "packet/Packet.h"
+#include "packet/AudioPacket.h"
 
 namespace conductor {
 
-class OnsetPacket : public Packet {
+class OnsetPacket : public AudioPacket {
 private:
-    uint64_t timestamp;
+    uint64_t onsetTimestamp;
     ImpresarioSerialization::OnsetMethod method;
-    uint64_t sampleTimestamp;
 
 public:
     static const OnsetPacket &from(const Packet &packet);
 
-    OnsetPacket(uint64_t timestamp, ImpresarioSerialization::OnsetMethod method, uint64_t sampleTimestamp);
+    OnsetPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, uint64_t onsetTimestamp,
+                ImpresarioSerialization::OnsetMethod method);
 
     std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
 
     ImpresarioSerialization::Identifier getIdentifier() const override;
-
-    uint64_t getSampleTimestamp() const;
 };
 
 }

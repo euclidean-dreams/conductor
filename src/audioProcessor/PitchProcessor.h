@@ -11,7 +11,7 @@
 #include "packet/PacketConduit.h"
 #include "packet/Packet.h"
 #include "packet/PitchPacket.h"
-#include "packet/AudioPacket.h"
+#include "packet/RawAudioPacket.h"
 #include "packet/PacketSpout.h"
 
 namespace conductor {

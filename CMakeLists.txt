@@ -12,6 +12,11 @@ integrate_cmake_dependency(
         GIT_TAG 703bd9caab50b139428cea1aaff9974ebee5742e
 )
 integrate_cmake_dependency(
+        NAME iir1
+        GIT_URL git@github.com:berndporr/iir1.git
+        GIT_TAG 67591c8eac591c576b9aabe9a2f288296bb263f0
+)
+integrate_cmake_dependency(
         NAME impresario-utils
         GIT_URL git@github.com:impresario-systems/impresario-utils.git
         GIT_TAG origin/dev
@@ -34,6 +39,7 @@ set(
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
         src/audioProcessor/PitchProcessor.cpp src/audioProcessor/PitchProcessor.h
+        src/audioProcessor/AudioFileWriter.cpp src/audioProcessor/AudioFileWriter.h
 
         src/packet/PacketConduit.cpp src/packet/PacketConduit.h
         src/packet/PacketCollectionManager.h
@@ -42,11 +48,11 @@ set(
 
         src/packet/Packet.h
         src/packet/NotSerializableException.h
-        src/packet/AudioPacket.cpp src/packet/AudioPacket.h
+        src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
         src/packet/PitchPacket.cpp src/packet/PitchPacket.h
 
-)
+        src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h src/packet/AudioPacket.cpp src/packet/AudioPacket.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -70,9 +76,10 @@ target_link_libraries(test-conductor PRIVATE gmock)
 find_package(cppzmq)
 foreach (target IN LISTS TARGETS)
     target_include_directories(${target} PRIVATE src)
+    target_link_libraries(${target} PRIVATE cppzmq)
+    target_link_libraries(${target} PRIVATE iir_static)
     target_link_libraries(${target} PRIVATE impresario-utils)
     target_link_libraries(${target} PRIVATE aubio)
     target_link_libraries(${target} PRIVATE portaudio)
-    target_link_libraries(${target} PRIVATE cppzmq)
     target_link_libraries(${target} PRIVATE pthread)
 endforeach ()

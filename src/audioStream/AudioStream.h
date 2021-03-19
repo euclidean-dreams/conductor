@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <NonCopyable.h>
-#include "packet/AudioPacket.h"
+#include "packet/RawAudioPacket.h"
 
 namespace conductor {
 
@@ -15,7 +15,7 @@ public:
 
     virtual void waitUntilNextPacketIsReady() = 0;
 
-    virtual std::unique_ptr<AudioPacket> getNextPacket() = 0;
+    virtual std::unique_ptr<RawAudioPacket> getNextPacket() = 0;
 };
 
 }

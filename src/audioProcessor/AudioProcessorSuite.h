@@ -6,6 +6,8 @@
 #include <vector>
 #include <zmq.hpp>
 #include <NonCopyable.h>
+#include "audioProcessor/AudioFileWriter.h"
+#include "audioProcessor/BandpassProcessor.h"
 #include "audioProcessor/AudioStreamSource.h"
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/OnsetProcessor.h"
@@ -19,24 +21,51 @@ class AudioProcessorSuite : impresarioUtils::NonCopyable {
 private:
     inline static const std::string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
     inline static const std::string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
-    inline static const std::array<ImpresarioSerialization::OnsetMethod, 1> ONSET_PROCESSORS = {
-//        ImpresarioSerialization::OnsetMethod::energy,
-//        ImpresarioSerialization::OnsetMethod::hfc,
-//        ImpresarioSerialization::OnsetMethod::complex,
-//        ImpresarioSerialization::OnsetMethod::phase,
-//        ImpresarioSerialization::OnsetMethod::wphase,
-//        ImpresarioSerialization::OnsetMethod::specdiff,
-//        ImpresarioSerialization::OnsetMethod::kl,
-//        ImpresarioSerialization::OnsetMethod::mkl,
-            ImpresarioSerialization::OnsetMethod::specflux
-    };
-    inline static const std::array<ImpresarioSerialization::PitchMethod, 1> PITCH_PROCESSORS = {
-//        ImpresarioSerialization::PitchMethod::schmitt,
-//        ImpresarioSerialization::PitchMethod::fcomb,
-//        ImpresarioSerialization::PitchMethod::mcomb,
-//        ImpresarioSerialization::PitchMethod::yin,
-//        ImpresarioSerialization::PitchMethod::yinfast,
-            ImpresarioSerialization::PitchMethod::yinfft
+    inline static const bool RECORD_AUDIO_TO_FILES = false;
+    inline static const std::map<
+            ImpresarioSerialization::FrequencyBand,
+            std::tuple<
+                    std::vector<ImpresarioSerialization::OnsetMethod>,
+                    std::vector<ImpresarioSerialization::PitchMethod>
+            >
+    > SUITE_CONFIGURATION = {
+            {ImpresarioSerialization::FrequencyBand::subBass, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }},
+            {ImpresarioSerialization::FrequencyBand::bass, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }},
+            {ImpresarioSerialization::FrequencyBand::lowMidrange, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }},
+            {ImpresarioSerialization::FrequencyBand::midrange, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {
+                            ImpresarioSerialization::PitchMethod::yinfft
+                    }
+            }},
+            {ImpresarioSerialization::FrequencyBand::upperMidrange, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }},
+            {ImpresarioSerialization::FrequencyBand::presence, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }},
+            {ImpresarioSerialization::FrequencyBand::brilliance, {
+                    {
+                            ImpresarioSerialization::OnsetMethod::specflux
+                    }, {}
+            }}
     };
 
     std::vector<std::unique_ptr<AudioProcessor>> audioProcessors;

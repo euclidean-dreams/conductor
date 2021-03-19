@@ -51,9 +51,11 @@ void OnsetProcessor::process() {
     auto packets = input->getPackets(1);
     auto onsetDelay = determineOnsetDelay(*packets);
     if (onsetDelay > 0) {
-        auto earliestTimestamp = AudioPacket::from(packets->getPacket(0)).getTimestamp();
+        auto &firstPacket = RawAudioPacket::from(packets->getPacket(0));
+        auto earliestTimestamp = firstPacket.getSampleTimestamp();
+        auto frequencyBand = firstPacket.getFrequencyBand();
         auto onsetTimestamp = determineOnsetTimestamp(onsetDelay, earliestTimestamp);
-        auto resultPacket = std::make_unique<OnsetPacket>(onsetTimestamp, method, earliestTimestamp);
+        auto resultPacket = std::make_unique<OnsetPacket>(earliestTimestamp, frequencyBand, onsetTimestamp, method);
         output->sendPacket(move(resultPacket));
     }
     packets->concludeUse();
@@ -62,9 +64,9 @@ void OnsetProcessor::process() {
 uint64_t OnsetProcessor::determineOnsetDelay(PacketCollection &packets) {
     auto indexOffset = 0;
     for (auto &packet: packets) {
-        auto &audioPacket = AudioPacket::from(*packet);
-        for (int index = indexOffset; index < audioPacket.size() + indexOffset; index++) {
-            onsetInput->data[index] = audioPacket.getSample(index);
+        auto &rawAudioPacket = RawAudioPacket::from(*packet);
+        for (int index = indexOffset; index < rawAudioPacket.size() + indexOffset; index++) {
+            onsetInput->data[index] = rawAudioPacket.getSample(index);
         }
     }
     aubio_onset_do(onsetAlgorithm, onsetInput, onsetResultWrapper);
@@ -73,10 +75,10 @@ uint64_t OnsetProcessor::determineOnsetDelay(PacketCollection &packets) {
     return onsetDelay;
 }
 
-uint64_t OnsetProcessor::determineOnsetTimestamp(uint64_t onsetDelay, uint64_t audioPacketTimestamp) {
+uint64_t OnsetProcessor::determineOnsetTimestamp(uint64_t onsetDelay, uint64_t rawAudioPacketTimestamp) {
     if (onsetDelay > 0) {
         auto currentTime = impresarioUtils::getCurrentTime();
-        auto totalDelay = onsetDelay + (currentTime - audioPacketTimestamp);
+        auto totalDelay = onsetDelay + (currentTime - rawAudioPacketTimestamp);
         return currentTime - totalDelay;
     } else {
         return 0;

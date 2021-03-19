@@ -17,8 +17,4 @@ bool AudioStreamSource::shouldContinue() {
     return true;
 }
 
-PacketConduit &AudioStreamSource::getOutput() {
-    return *output;
-}
-
 }

@@ -5,7 +5,7 @@ namespace conductor {
 
 class RingBufferTest : public testing::Test {
 protected:
-    RingBuffer ringBuffer{2, 3};
+    RingBuffer ringBuffer{2};
 
     void static nextPacketMatchesExpected(RingBuffer &ringBuffer, float *expected) {
         ASSERT_TRUE(ringBuffer.nextPacketIsReady());

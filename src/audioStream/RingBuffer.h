@@ -5,7 +5,10 @@
 #include <condition_variable>
 #include <memory>
 #include <vector>
+#include <Time.h>
+#include <FrequencyBand_generated.h>
 #include "audioStream/AudioStream.h"
+#include "packet/RawAudioPacket.h"
 
 namespace conductor {
 
@@ -30,7 +33,7 @@ public:
 
     void waitUntilNextPacketIsReady() override;
 
-    std::unique_ptr<AudioPacket> getNextPacket() override;
+    std::unique_ptr<RawAudioPacket> getNextPacket() override;
 };
 
 }

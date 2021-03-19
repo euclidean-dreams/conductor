@@ -4,27 +4,25 @@
 #include <cstdint>
 #include <Pitch_generated.h>
 #include "Config.h"
-#include "packet/Packet.h"
+#include "packet/AudioPacket.h"
 
 namespace conductor {
 
-class PitchPacket : public Packet {
+class PitchPacket : public AudioPacket {
 private:
     ImpresarioSerialization::PitchMethod method;
     uint8_t pitch;
     float confidence;
-    uint64_t sampleTimestamp;
 
 public:
     static const PitchPacket &from(const Packet &packet);
 
-    PitchPacket(ImpresarioSerialization::PitchMethod method, uint8_t pitch, float confidence, uint64_t sampleTimestamp);
+    PitchPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
+                ImpresarioSerialization::PitchMethod method, uint8_t pitch, float confidence);
 
     std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
 
     ImpresarioSerialization::Identifier getIdentifier() const override;
-
-    uint64_t getSampleTimestamp() const;
 };
 
 }

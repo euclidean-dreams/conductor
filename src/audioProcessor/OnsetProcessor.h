@@ -8,7 +8,7 @@
 #include <OnsetProcessorParameters_generated.h>
 #include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
-#include "packet/AudioPacket.h"
+#include "packet/RawAudioPacket.h"
 #include "packet/OnsetPacket.h"
 #include "packet/PacketConduit.h"
 #include "packet/PacketSpout.h"
@@ -34,11 +34,10 @@ private:
 
     uint64_t determineOnsetDelay(PacketCollection &packets);
 
-    static uint64_t determineOnsetTimestamp(uint64_t onsetDelay, uint64_t audioPacketTimestamp);
+    static uint64_t determineOnsetTimestamp(uint64_t onsetDelay, uint64_t rawAudioPacketTimestamp);
 
 public:
-    OnsetProcessor(std::unique_ptr<PacketSpout> input,
-                   std::shared_ptr<PacketConduit> output,
+    OnsetProcessor(std::unique_ptr<PacketSpout> input, std::shared_ptr<PacketConduit> output,
                    std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                    ImpresarioSerialization::OnsetMethod method);
 

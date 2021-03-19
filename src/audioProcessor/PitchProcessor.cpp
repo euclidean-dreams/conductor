@@ -46,17 +46,19 @@ void PitchProcessor::process() {
     auto packets = input->getPackets(1);
     auto indexOffset = 0;
     for (auto &packet: *packets) {
-        auto &audioPacket = AudioPacket::from(*packet);
-        for (int index = indexOffset; index < audioPacket.size() + indexOffset; index++) {
-            pitchInput->data[index] = audioPacket.getSample(index);
+        auto &rawAudioPacket = RawAudioPacket::from(*packet);
+        for (int index = indexOffset; index < rawAudioPacket.size() + indexOffset; index++) {
+            pitchInput->data[index] = rawAudioPacket.getSample(index);
         }
     }
     aubio_pitch_do(pitchAlgorithm, pitchInput, pitchResultWrapper);
     auto confidence = aubio_pitch_get_confidence(pitchAlgorithm);
     float pitch = fvec_get_sample(pitchResultWrapper, 0);
-    if(pitch > 0) {
-        auto earliestTimestamp = AudioPacket::from(packets->getPacket(0)).getTimestamp();
-        auto resultPacket = std::make_unique<PitchPacket>(method, pitch, confidence, earliestTimestamp);
+    if (pitch > 0) {
+        auto &firstPacket = RawAudioPacket::from(packets->getPacket(0));
+        auto earliestTimestamp = firstPacket.getSampleTimestamp();
+        auto frequencyBand = firstPacket.getFrequencyBand();
+        auto resultPacket = std::make_unique<PitchPacket>(earliestTimestamp, frequencyBand, method, pitch, confidence);
         output->sendPacket(move(resultPacket));
     }
     packets->concludeUse();

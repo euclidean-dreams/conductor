@@ -9,7 +9,6 @@ namespace conductor {
 class PacketCollectionManagerMock : public PacketCollectionManager {
 public:
     MOCK_METHOD(void, concludePacketCollectionUse, (int size));
-
 };
 
 }

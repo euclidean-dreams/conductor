@@ -23,8 +23,6 @@ public:
     void process() override;
 
     bool shouldContinue() override;
-
-    PacketConduit &getOutput();
 };
 
 }

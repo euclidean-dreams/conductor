@@ -23,14 +23,11 @@ AudioStream &AudioInput::getAudioStream() {
     return outputStream;
 }
 
-int AudioInput::streamCallback(const void *input,
-                               void *output,
-                               unsigned long frameCount,
-                               const PaStreamCallbackTimeInfo *timeInfo,
-                               PaStreamCallbackFlags statusFlags,
+int AudioInput::streamCallback(const void *input, void *output, unsigned long frameCount,
+                               const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                                void *userData) {
     auto samples = static_cast<const float *>(input);
-    auto ringBuffer = (RingBuffer *) userData;
+    auto ringBuffer = static_cast<RingBuffer *>(userData);
     ringBuffer->addSamples(samples, frameCount);
     return paContinue;
 }
