@@ -8,11 +8,13 @@ const STFTPacket &STFTPacket::from(const Packet &packet) {
 
 STFTPacket::STFTPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size)
         : AudioPacket{sampleTimestamp, frequencyBand},
-          data{},
+          real{},
+          imaginary{},
           maxSize{size},
           addIndex{0},
           finalized{false} {
-    data.reserve(maxSize);
+    real.reserve(maxSize);
+    imaginary.reserve(maxSize);
 }
 
 std::unique_ptr<flatbuffers::FlatBufferBuilder> STFTPacket::serialize() const {
@@ -23,28 +25,44 @@ ImpresarioSerialization::Identifier STFTPacket::getIdentifier() const {
     throw NotSerializableException();
 }
 
-void STFTPacket::addSample(float sample) {
+void STFTPacket::addSample(float realPart, float imaginaryPart) {
     if (finalized) {
-        throw std::runtime_error("attempted to add a sample to a finalized audio packet");
+        throw std::runtime_error("attempted to add a sample to a finalized packet");
     }
-    data[addIndex] = sample;
+    real[addIndex] = realPart;
+    imaginary[addIndex] = imaginaryPart;
     addIndex++;
     if (addIndex == maxSize) {
         finalized = true;
     }
 }
 
-float STFTPacket::getSample(int index) const {
+void STFTPacket::validateRetrieve(int index) const {
     if (!finalized) {
-        throw std::runtime_error("attempted to use an audio packet that wasn't finalized");
+        throw std::runtime_error("attempted to use a packet that wasn't finalized");
     }
     if (index < 0 || index >= maxSize) {
         throw std::out_of_range("attempted to access an out of range sample");
     }
-    return data[index];
+}
+
+float STFTPacket::getRealPart(int index) const {
+    validateRetrieve(index);
+    return real[index];
+}
+
+float STFTPacket::getImaginaryPart(int index) const {
+    validateRetrieve(index);
+    return imaginary[index];
+}
+
+float STFTPacket::getMagnitude(int index) const {
+    validateRetrieve(index);
+    return static_cast<float>(std::sqrt(std::pow(real[index], 2) + std::pow(imaginary[index], 2)));
 }
 
 int STFTPacket::size() const {
     return maxSize;
 }
+
 }

@@ -5,16 +5,16 @@ namespace conductor {
 STFTProcessor::STFTProcessor(std::unique_ptr<PacketSpout> input, std::unique_ptr<PacketConduit> output)
         : input{move(input)},
           output{move(output)},
-          fftInput{static_cast<float *>(mufft_alloc(FFT_SIZE * sizeof(float)))},
-          fftOutput{static_cast<cfloat *>(mufft_alloc(FFT_SIZE * sizeof(cfloat)))},
-          fftPlan{mufft_create_plan_1d_r2c(FFT_SIZE, 0)},
+          fftInput{static_cast<ne10_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_float32_t)))},
+          fftOutput{static_cast<ne10_fft_cpx_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_fft_cpx_float32_t)))},
+          fftPlan{ne10_fft_alloc_r2c_float32(FFT_SIZE)},
           currentPackets{} {
 }
 
 STFTProcessor::~STFTProcessor() {
-    mufft_free(fftInput);
-    mufft_free(fftOutput);
-    mufft_free(fftPlan);
+    NE10_FREE(fftInput);
+    NE10_FREE(fftOutput);
+    ne10_fft_destroy_r2c_float32(fftPlan);
 }
 
 void STFTProcessor::setup() {
@@ -36,24 +36,23 @@ void STFTProcessor::process() {
             auto &packet = RawAudioPacket::from(*packetPointer);
             for (int i = 0; i < packet.size(); i++) {
                 auto sample = packet.getSample(i);
-                fftInput[fftInputIndex] = sample * hannWindow(fftInputIndex);
+                fftInput[fftInputIndex] = sample * hammingWindow(fftInputIndex);
                 fftInputIndex++;
             }
         }
     }
-    mufft_execute_plan_1d(fftPlan, fftOutput, fftInput);
+    ne10_fft_r2c_1d_float32_neon(fftOutput, fftInput, fftPlan);
     auto earliestTimestamp = RawAudioPacket::from(currentPackets.front()->getPacket(0)).getSampleTimestamp();
     auto outputPacket = std::make_unique<STFTPacket>(earliestTimestamp, ImpresarioSerialization::FrequencyBand::all,
-                                                     FFT_SIZE / 2);
-    for (int i = 0; i < FFT_SIZE / 2; i++) {
-        auto magnitude = std::sqrt(std::pow(fftOutput[i].real, 2) + std::pow(fftOutput[i].imag, 2));
-        outputPacket->addSample(magnitude);
+                                                     FFT_SIZE / 2 + 1);
+    for (int i = 0; i < FFT_SIZE / 2 + 1; i++) {
+        outputPacket->addSample(fftOutput[i].r, fftOutput[i].i);
     }
     output->sendPacket(move(outputPacket));
 }
 
-float STFTProcessor::hannWindow(int sampleNumber) {
-    return static_cast<float>(0.5 * (1 - cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1))));
+float STFTProcessor::hammingWindow(int sampleNumber) {
+    return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1)));
 }
 
 bool STFTProcessor::shouldContinue() {

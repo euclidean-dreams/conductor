@@ -6,7 +6,8 @@
 #include <vector>
 #include <zmq.hpp>
 #include <NonCopyable.h>
-#include "audioProcessor/AudioFileWriter.h"
+#include "audioProcessor/fileWriter/RawAudioFileWriter.h"
+#include "audioProcessor/fileWriter/STFTFileWriter.h"
 #include "audioProcessor/BandpassProcessor.h"
 #include "audioProcessor/STFTProcessor.h"
 #include "audioProcessor/AudioStreamSource.h"
@@ -22,7 +23,7 @@ class AudioProcessorSuite : impresarioUtils::NonCopyable {
 private:
     inline static const std::string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
     inline static const std::string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
-    inline static const bool RECORD_AUDIO_TO_FILES = false;
+    inline static const bool RECORD_TO_FILES = false;
     inline static const std::map<
             ImpresarioSerialization::FrequencyBand,
             std::tuple<

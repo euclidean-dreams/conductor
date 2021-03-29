@@ -1,8 +1,8 @@
 #ifndef CONDUCTOR_STFTPROCESSOR_H
 #define CONDUCTOR_STFTPROCESSOR_H
 
-#include <fft.h>
-#include <fft_internal.h>
+#include <cmath>
+#include <NE10.h>
 #include <Time.h>
 #include "Config.h"
 #include "packet/RawAudioPacket.h"
@@ -15,17 +15,17 @@ namespace conductor {
 
 class STFTProcessor : public AudioProcessor {
 private:
-    inline static const int HOP_SIZE = 2; // power of 2
-    inline static const int WINDOW_SIZE = 8; // power of 2
+    inline static const int HOP_SIZE = 4; // power of 2
+    inline static const int WINDOW_SIZE = 16; // power of 2
     inline static const int FFT_SIZE = WINDOW_SIZE * AUDIO_PACKET_SIZE;
     std::unique_ptr<PacketSpout> input;
     std::unique_ptr<PacketConduit> output;
-    float *fftInput;
-    cfloat *fftOutput;
-    mufft_plan_1d *fftPlan;
+    ne10_float32_t *fftInput;
+    ne10_fft_cpx_float32_t *fftOutput;
+    ne10_fft_r2c_cfg_float32_t fftPlan;
     std::list<std::unique_ptr<PacketCollection>> currentPackets;
 
-    static float hannWindow(int sampleNumber);
+    static float hammingWindow(int sampleNumber);
 
 public:
     STFTProcessor(std::unique_ptr<PacketSpout> input, std::unique_ptr<PacketConduit> output);

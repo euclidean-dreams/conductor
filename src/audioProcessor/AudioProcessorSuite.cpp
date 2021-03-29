@@ -20,6 +20,21 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     auto stftProcessor = std::make_unique<STFTProcessor>(move(stftInput), move(stftOutput));
     audioProcessors.push_back(move(stftProcessor));
 
+    // stft file writer
+    if (RECORD_TO_FILES) {
+        auto fileWriterInput = std::make_unique<PacketSpout>(stftOutputRef);
+        auto fileWriter = std::make_unique<STFTFileWriter>(move(fileWriterInput), "stft");
+        audioProcessors.push_back(move(fileWriter));
+    }
+
+    // audio file writer
+    if (RECORD_TO_FILES) {
+        auto fileWriterInput = std::make_unique<PacketSpout>(audioStreamOutputRef);
+        auto relativePath = std::string{"raw_audio/all.raw"};
+        auto fileWriter = std::make_unique<RawAudioFileWriter>(move(fileWriterInput), relativePath);
+        audioProcessors.push_back(move(fileWriter));
+    }
+
     // sink
     auto suiteOutput = std::make_shared<PacketConduit>();
     auto sinkInput = std::make_unique<PacketSpout>(*suiteOutput);
@@ -43,13 +58,6 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
         auto bandpassProcessor = std::make_unique<BandpassProcessor>(move(bandpassInput), move(bandpassOutput),
                                                                      frequencyBand);
         audioProcessors.push_back(move(bandpassProcessor));
-
-        // file writers
-        if (RECORD_AUDIO_TO_FILES) {
-            auto audioFileWriterInput = std::make_unique<PacketSpout>(bandpassOutputRef);
-            auto audioFileWriter = std::make_unique<AudioFileWriter>(move(audioFileWriterInput), frequencyBand);
-            audioProcessors.push_back(move(audioFileWriter));
-        }
 
         // onset processors
         for (auto method : onsetMethods) {
