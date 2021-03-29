@@ -13,6 +13,13 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     auto audioStreamSource = std::make_unique<AudioStreamSource>(audioStream, move(audioStreamOutput));
     audioProcessors.push_back(move(audioStreamSource));
 
+    // stft
+    auto stftInput = std::make_unique<PacketSpout>(audioStreamOutputRef);
+    auto stftOutput = std::make_unique<PacketConduit>();
+    auto &stftOutputRef = *stftOutput;
+    auto stftProcessor = std::make_unique<STFTProcessor>(move(stftInput), move(stftOutput));
+    audioProcessors.push_back(move(stftProcessor));
+
     // sink
     auto suiteOutput = std::make_shared<PacketConduit>();
     auto sinkInput = std::make_unique<PacketSpout>(*suiteOutput);

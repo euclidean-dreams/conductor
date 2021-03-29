@@ -19,7 +19,6 @@ void AudioProcessorSink::process() {
     auto &packet = packets->getPacket(0);
     auto message = packets->getPacket(0).serialize();
     output->sendSerializedData(packet.getIdentifier(), *packet.serialize());
-    packets->concludeUse();
 }
 
 bool AudioProcessorSink::shouldContinue() {

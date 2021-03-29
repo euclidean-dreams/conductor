@@ -8,6 +8,7 @@
 #include <NonCopyable.h>
 #include "audioProcessor/AudioFileWriter.h"
 #include "audioProcessor/BandpassProcessor.h"
+#include "audioProcessor/STFTProcessor.h"
 #include "audioProcessor/AudioStreamSource.h"
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/OnsetProcessor.h"

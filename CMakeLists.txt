@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(-Wno-psabi)
 
+SET(MUFFT_ENABLE_FFTW OFF)
+
 include(lib/cmake-utils/dependency-integrator.cmake)
 integrate_cmake_dependency(
         NAME googletest
@@ -15,6 +17,11 @@ integrate_cmake_dependency(
         NAME iir1
         GIT_URL git@github.com:berndporr/iir1.git
         GIT_TAG 67591c8eac591c576b9aabe9a2f288296bb263f0
+)
+integrate_cmake_dependency(
+        NAME mufft
+        GIT_URL git@github.com:Themaister/muFFT.git
+        GIT_TAG 47bb08652eab399c2c7d460abe5184857110f130
 )
 integrate_cmake_dependency(
         NAME impresario-utils
@@ -37,6 +44,8 @@ set(
         src/audioProcessor/AudioProcessorSuite.cpp src/audioProcessor/AudioProcessorSuite.h
         src/audioProcessor/AudioStreamSource.cpp src/audioProcessor/AudioStreamSource.h
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
+        src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h
+        src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
         src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
         src/audioProcessor/PitchProcessor.cpp src/audioProcessor/PitchProcessor.h
         src/audioProcessor/AudioFileWriter.cpp src/audioProcessor/AudioFileWriter.h
@@ -48,11 +57,12 @@ set(
 
         src/packet/Packet.h
         src/packet/NotSerializableException.h
+        src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
+        src/packet/STFTPacket.cpp src/packet/STFTPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
         src/packet/PitchPacket.cpp src/packet/PitchPacket.h
-
-        src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h src/packet/AudioPacket.cpp src/packet/AudioPacket.h)
+)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -78,6 +88,7 @@ foreach (target IN LISTS TARGETS)
     target_include_directories(${target} PRIVATE src)
     target_link_libraries(${target} PRIVATE cppzmq)
     target_link_libraries(${target} PRIVATE iir_static)
+    target_link_libraries(${target} PRIVATE muFFT)
     target_link_libraries(${target} PRIVATE impresario-utils)
     target_link_libraries(${target} PRIVATE aubio)
     target_link_libraries(${target} PRIVATE portaudio)

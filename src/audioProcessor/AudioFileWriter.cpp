@@ -25,7 +25,6 @@ void AudioFileWriter::process() {
         outputBuffer[index] = packet.getSample(index);
     }
     fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), packet.size() * sizeof(float));
-    packets->concludeUse();
 }
 
 bool AudioFileWriter::shouldContinue() {

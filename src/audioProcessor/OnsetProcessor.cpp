@@ -58,7 +58,6 @@ void OnsetProcessor::process() {
         auto resultPacket = std::make_unique<OnsetPacket>(earliestTimestamp, frequencyBand, onsetTimestamp, method);
         output->sendPacket(move(resultPacket));
     }
-    packets->concludeUse();
 }
 
 uint64_t OnsetProcessor::determineOnsetDelay(PacketCollection &packets) {

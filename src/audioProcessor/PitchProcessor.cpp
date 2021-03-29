@@ -61,7 +61,6 @@ void PitchProcessor::process() {
         auto resultPacket = std::make_unique<PitchPacket>(earliestTimestamp, frequencyBand, method, pitch, confidence);
         output->sendPacket(move(resultPacket));
     }
-    packets->concludeUse();
 }
 
 bool PitchProcessor::shouldContinue() {

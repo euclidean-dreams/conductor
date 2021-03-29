@@ -17,11 +17,11 @@ private:
 public:
     explicit PacketCollection(PacketCollectionManager &packetCollectionManager);
 
+    ~PacketCollection();
+
     void addPacket(std::shared_ptr<const Packet> packet);
 
     const Packet &getPacket(int index);
-
-    void concludeUse();
 
     std::vector<std::shared_ptr<const Packet>>::const_iterator begin() const;
 

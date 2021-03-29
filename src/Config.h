@@ -13,7 +13,7 @@ constexpr std::string_view LOGGER_NAME = "conductor";
 constexpr int PROCESSOR_HOP_SIZE = 128;
 constexpr int PROCESSOR_BUFFER_SIZE = 512;
 constexpr float SAMPLE_RATE = 44100.00;
-constexpr int AUDIO_PACKET_SIZE = PROCESSOR_HOP_SIZE;
+constexpr int AUDIO_PACKET_SIZE = 128;
 
 }
 

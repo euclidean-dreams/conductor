@@ -29,7 +29,6 @@ void BandpassProcessor::process() {
         outputPacket->addSample(filter.filter(inputPacket.getSample(i)));
     }
     output->sendPacket(move(outputPacket));
-    inputPackets->concludeUse();
 }
 
 bool BandpassProcessor::shouldContinue() {

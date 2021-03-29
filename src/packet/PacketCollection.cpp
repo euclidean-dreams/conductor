@@ -8,16 +8,16 @@ PacketCollection::PacketCollection(PacketCollectionManager &packetCollectionMana
 
 }
 
+PacketCollection::~PacketCollection() {
+    packetCollectionManager.concludePacketCollectionUse(packets.size());
+}
+
 void PacketCollection::addPacket(std::shared_ptr<const Packet> packet) {
     packets.push_back(move(packet));
 }
 
 const Packet &PacketCollection::getPacket(int index) {
     return *packets[index];
-}
-
-void PacketCollection::concludeUse() {
-    packetCollectionManager.concludePacketCollectionUse(packets.size());
 }
 
 std::vector<std::shared_ptr<const Packet>>::const_iterator PacketCollection::begin() const {
