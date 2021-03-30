@@ -56,8 +56,7 @@ set(
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
-        src/audioProcessor/OnsetProcessor.cpp src/audioProcessor/OnsetProcessor.h
-        src/audioProcessor/PitchProcessor.cpp src/audioProcessor/PitchProcessor.h
+        src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
 
         src/audioProcessor/fileWriter/FileWriter.cpp src/audioProcessor/fileWriter/FileWriter.h
         src/audioProcessor/fileWriter/RawAudioFileWriter.cpp src/audioProcessor/fileWriter/RawAudioFileWriter.h
@@ -102,7 +101,6 @@ foreach (target IN LISTS TARGETS)
     target_link_libraries(${target} PRIVATE cppzmq)
     target_link_libraries(${target} PRIVATE iir_static)
     target_link_libraries(${target} PRIVATE impresario-utils)
-    target_link_libraries(${target} PRIVATE aubio)
     target_link_libraries(${target} PRIVATE portaudio)
     target_link_libraries(${target} PRIVATE pthread)
 

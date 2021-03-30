@@ -25,10 +25,14 @@ void PacketConduit::validatePacketsAvailable(int spoutId, int packetCount) {
 void PacketConduit::clean() {
     bool shouldRemovePacket = true;
     while (shouldRemovePacket) {
-        for (auto &spoutIterator: spoutIterators) {
-            if (spoutIterator == packets.cbegin()) {
-                shouldRemovePacket = false;
+        if (packets.front().use_count() == 1) {
+            for (auto &spoutIterator: spoutIterators) {
+                if (spoutIterator == packets.cbegin()) {
+                    shouldRemovePacket = false;
+                }
             }
+        } else {
+            shouldRemovePacket = false;
         }
         if (shouldRemovePacket) {
             packets.pop_front();
@@ -44,6 +48,7 @@ void PacketConduit::sendPacket(std::unique_ptr<const Packet> packet) {
             spoutIterator--;
         }
     }
+    clean();
     newPacketAddedExpectant.notify_all();
 }
 
@@ -71,30 +76,28 @@ void PacketConduit::waitForAvailablePackets(int spoutId, int packetCount) {
     }
 }
 
-std::unique_ptr<PacketCollection> PacketConduit::getPackets(int spoutId, int packetCount,
-                                                            PacketCollectionManager &packetCollectionManager) {
+std::shared_ptr<const Packet> PacketConduit::getPacket(int spoutId) {
+    std::lock_guard<std::mutex> lock{mutex};
     validateSpoutId(spoutId);
-    validatePacketsAvailable(spoutId, packetCount);
-    auto result = std::make_unique<PacketCollection>(packetCollectionManager);
-    auto copiedIterator{spoutIterators[spoutId]};
-    while (packetCount > 0) {
-        result->addPacket(*copiedIterator);
-        copiedIterator++;
-        packetCount--;
-    }
+    validatePacketsAvailable(spoutId, 1);
+    auto &spoutIterator = spoutIterators[spoutId];
+    auto result = *spoutIterator;
+    spoutIterator++;
     return result;
 }
 
-void PacketConduit::concludePacketUse(int spoutId, int packetCount) {
+std::unique_ptr<PacketCollection> PacketConduit::getPackets(int spoutId, int packetCount) {
     std::lock_guard<std::mutex> lock{mutex};
     validateSpoutId(spoutId);
     validatePacketsAvailable(spoutId, packetCount);
+    auto result = std::make_unique<PacketCollection>();
     auto &spoutIterator = spoutIterators[spoutId];
     while (packetCount > 0) {
+        result->addPacket(*spoutIterator);
         spoutIterator++;
         packetCount--;
     }
-    clean();
+    return result;
 }
 
 }

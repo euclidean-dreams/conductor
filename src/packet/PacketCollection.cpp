@@ -2,14 +2,9 @@
 
 namespace conductor {
 
-PacketCollection::PacketCollection(PacketCollectionManager &packetCollectionManager)
-        : packetCollectionManager{packetCollectionManager},
-          packets{} {
+PacketCollection::PacketCollection()
+        : packets{} {
 
-}
-
-PacketCollection::~PacketCollection() {
-    packetCollectionManager.concludePacketCollectionUse(packets.size());
 }
 
 void PacketCollection::addPacket(std::shared_ptr<const Packet> packet) {

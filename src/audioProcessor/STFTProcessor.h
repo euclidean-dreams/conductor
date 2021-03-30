@@ -15,8 +15,8 @@ namespace conductor {
 
 class STFTProcessor : public AudioProcessor {
 private:
-    inline static const int HOP_SIZE = 4; // power of 2
-    inline static const int WINDOW_SIZE = 16; // power of 2
+    inline static const int HOP_SIZE = 1; // power of 2
+    inline static const int WINDOW_SIZE = 4; // power of 2
     inline static const int FFT_SIZE = WINDOW_SIZE * AUDIO_PACKET_SIZE;
     std::unique_ptr<PacketSpout> input;
     std::unique_ptr<PacketConduit> output;

@@ -3,7 +3,7 @@
 namespace conductor {
 
 RawAudioFileWriter::RawAudioFileWriter(std::unique_ptr<PacketSpout> input, const std::string &fileName)
-        : FileWriter(move(input), fileName) {
+        : FileWriter{move(input), fileName} {
 
 }
 

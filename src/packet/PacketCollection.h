@@ -11,13 +11,10 @@ namespace conductor {
 
 class PacketCollection : impresarioUtils::NonCopyable {
 private:
-    PacketCollectionManager &packetCollectionManager;
     std::vector<std::shared_ptr<const Packet>> packets;
 
 public:
-    explicit PacketCollection(PacketCollectionManager &packetCollectionManager);
-
-    ~PacketCollection();
+    explicit PacketCollection();
 
     void addPacket(std::shared_ptr<const Packet> packet);
 

@@ -8,13 +8,14 @@ PacketSpout::PacketSpout(PacketConduit &packetConduit)
 
 }
 
-std::unique_ptr<PacketCollection> PacketSpout::getPackets(int packetCount) {
-    packetConduit.waitForAvailablePackets(spoutId, packetCount);
-    return packetConduit.getPackets(spoutId, packetCount, *this);
+std::shared_ptr<const Packet> PacketSpout::getPacket() {
+    packetConduit.waitForAvailablePackets(spoutId, 1);
+    return packetConduit.getPacket(spoutId);
 }
 
-void PacketSpout::concludePacketCollectionUse(int size) {
-    packetConduit.concludePacketUse(spoutId, size);
+std::unique_ptr<PacketCollection> PacketSpout::getPackets(int packetCount) {
+    packetConduit.waitForAvailablePackets(spoutId, packetCount);
+    return packetConduit.getPackets(spoutId, packetCount);
 }
 
 }

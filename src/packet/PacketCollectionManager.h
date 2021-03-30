@@ -8,8 +8,6 @@ namespace conductor {
 class PacketCollectionManager : impresarioUtils::NonCopyable {
 public:
     virtual ~PacketCollectionManager() = default;
-
-    virtual void concludePacketCollectionUse(int size) = 0;
 };
 
 }

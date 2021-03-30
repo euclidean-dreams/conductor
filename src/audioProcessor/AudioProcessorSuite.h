@@ -12,8 +12,7 @@
 #include "audioProcessor/STFTProcessor.h"
 #include "audioProcessor/AudioStreamSource.h"
 #include "audioProcessor/AudioProcessorSink.h"
-#include "audioProcessor/OnsetProcessor.h"
-#include "audioProcessor/PitchProcessor.h"
+#include "audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h"
 #include "audioStream/AudioStream.h"
 #include "packet/PacketConduit.h"
 
@@ -74,8 +73,6 @@ private:
 
 public:
     AudioProcessorSuite(zmq::context_t &context, AudioStream &audioStream);
-
-    ~AudioProcessorSuite();
 
     void activate();
 

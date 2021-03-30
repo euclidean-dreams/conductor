@@ -36,10 +36,9 @@ public:
 
     void waitForAvailablePackets(int spoutId, int packetCount);
 
-    std::unique_ptr<PacketCollection> getPackets(int spoutId, int packetCount,
-                                                 PacketCollectionManager &packetCollectionManager);
+    std::shared_ptr<const Packet> getPacket(int spoutId);
 
-    void concludePacketUse(int spoutId, int packetCount);
+    std::unique_ptr<PacketCollection> getPackets(int spoutId, int packetCount);
 };
 
 }

@@ -15,9 +15,9 @@ private:
 public:
     explicit PacketSpout(PacketConduit &packetConduit);
 
-    std::unique_ptr<PacketCollection> getPackets(int packetCount);
+    std::shared_ptr<const Packet> getPacket();
 
-    void concludePacketCollectionUse(int size) override;
+    std::unique_ptr<PacketCollection> getPackets(int packetCount);
 };
 
 }
