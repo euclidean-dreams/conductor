@@ -5,8 +5,8 @@
 #include <condition_variable>
 #include <memory>
 #include <vector>
-#include <Time.h>
-#include <FrequencyBand_generated.h>
+#include <ImpresarioUtils.h>
+#include <ImpresarioSerialization.h>
 #include "audioStream/AudioStream.h"
 #include "packet/RawAudioPacket.h"
 

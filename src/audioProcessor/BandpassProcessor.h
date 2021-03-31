@@ -3,12 +3,12 @@
 
 #include <map>
 #include <Iir.h>
-#include <FrequencyBand_generated.h>
+#include <ImpresarioSerialization.h>
 #include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/RawAudioPacket.h"
-#include "packet/PacketConduit.h"
-#include "packet/PacketSpout.h"
+#include "packet/PacketDispatcher.h"
+#include "packet/PacketReceiver.h"
 
 namespace conductor {
 
@@ -25,20 +25,17 @@ private:
             {ImpresarioSerialization::FrequencyBand::brilliance,    {6000, 20000}}
     };
 
-    std::unique_ptr<PacketSpout> input;
-    std::unique_ptr<PacketConduit> output;
+    std::unique_ptr<PacketReceiver<RawAudioPacket>> input;
+    std::unique_ptr<PacketDispatcher<RawAudioPacket>> output;
     ImpresarioSerialization::FrequencyBand frequencyBand;
     Iir::Butterworth::BandPass<ORDER> filter;
 
 public:
-    BandpassProcessor(std::unique_ptr<PacketSpout> input, std::unique_ptr<PacketConduit> output,
+    BandpassProcessor(std::unique_ptr<PacketReceiver<RawAudioPacket>> input,
+                      std::unique_ptr<PacketDispatcher<RawAudioPacket>> output,
                       ImpresarioSerialization::FrequencyBand frequencyBand);
 
-    void setup() override;
-
     void process() override;
-
-    bool shouldContinue() override;
 };
 
 }

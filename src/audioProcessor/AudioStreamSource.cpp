@@ -3,7 +3,7 @@
 namespace conductor {
 
 AudioStreamSource::AudioStreamSource(AudioStream &audioStream,
-                                     std::unique_ptr<PacketConduit> output)
+                                     std::unique_ptr<PacketDispatcher<RawAudioPacket>> output)
         : audioStream{audioStream},
           output{move(output)} {
 }
@@ -11,10 +11,6 @@ AudioStreamSource::AudioStreamSource(AudioStream &audioStream,
 void AudioStreamSource::process() {
     audioStream.waitUntilNextPacketIsReady();
     output->sendPacket(audioStream.getNextPacket());
-}
-
-bool AudioStreamSource::shouldContinue() {
-    return true;
 }
 
 }

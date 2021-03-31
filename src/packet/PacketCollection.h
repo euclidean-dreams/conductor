@@ -3,26 +3,37 @@
 
 #include <memory>
 #include <vector>
-#include <NonCopyable.h>
+#include <ImpresarioUtils.h>
 #include "packet/Packet.h"
-#include "packet/PacketCollectionManager.h"
 
 namespace conductor {
 
-class PacketCollection : impresarioUtils::NonCopyable {
+template<class T>
+class PacketCollection : virtual impresarioUtils::NonCopyable {
 private:
-    std::vector<std::shared_ptr<const Packet>> packets;
+    std::vector<std::shared_ptr<const T>> packets;
 
 public:
-    explicit PacketCollection();
+    explicit PacketCollection()
+            : packets{} {
 
-    void addPacket(std::shared_ptr<const Packet> packet);
+    }
 
-    const Packet &getPacket(int index);
+    void addPacket(std::shared_ptr<const T> packet) {
+        packets.push_back(move(packet));
+    }
 
-    std::vector<std::shared_ptr<const Packet>>::const_iterator begin() const;
+    const T &getPacket(int index) {
+        return *packets[index];
+    }
 
-    std::vector<std::shared_ptr<const Packet>>::const_iterator end() const;
+    typename std::vector<std::shared_ptr<const T>>::const_iterator begin() const {
+        return packets.cbegin();
+    }
+
+    typename std::vector<std::shared_ptr<const T>>::const_iterator end() const {
+        return packets.cend();
+    }
 };
 
 }

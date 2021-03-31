@@ -2,8 +2,8 @@
 
 namespace conductor {
 
-SpecFluxOnsetProcessor::SpecFluxOnsetProcessor(std::unique_ptr<PacketSpout> input,
-                                               std::shared_ptr<PacketConduit> output,
+SpecFluxOnsetProcessor::SpecFluxOnsetProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
+                                               std::shared_ptr<PacketDispatcher<Serializable>> output,
                                                std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                                                ImpresarioSerialization::FrequencyBand frequencyBand)
         : input{move(input)},
@@ -55,22 +55,13 @@ void SpecFluxOnsetProcessor::updateAlgorithmParameters() {
     }
 }
 
-void SpecFluxOnsetProcessor::setup() {
-
-}
-
-bool SpecFluxOnsetProcessor::shouldContinue() {
-    return true;
-}
-
 void SpecFluxOnsetProcessor::process() {
     updateAlgorithmParameters();
     if (previousPacket == nullptr) {
         previousPacket = input->getPacket();
     }
     auto currentPacket = input->getPacket();
-    auto &currentSTFT = STFTPacket::from(*currentPacket);
-    catalogNextSpectralFlux(currentSTFT);
+    catalogNextSpectralFlux(*currentPacket);
     if (spectralFluxCatalog.size() == expectedSpectralFluxCatalogSize()
         && spectralFluxTimestamps.size() == expectedSpectralFluxTimestampSize()) {
         if (onsetDetected()) {
@@ -86,9 +77,7 @@ void SpecFluxOnsetProcessor::process() {
 }
 
 void SpecFluxOnsetProcessor::catalogNextSpectralFlux(const STFTPacket &currentSTFT) {
-    auto &previousSTFT = STFTPacket::from(*previousPacket);
-    auto spectralFlux = calculateSpectralFlux(currentSTFT, previousSTFT);
-
+    auto spectralFlux = calculateSpectralFlux(currentSTFT, *previousPacket);
     while (spectralFluxCatalog.size() >= expectedSpectralFluxCatalogSize()) {
         spectralFluxCatalog.pop_back();
     }
@@ -98,7 +87,7 @@ void SpecFluxOnsetProcessor::catalogNextSpectralFlux(const STFTPacket &currentST
     while (spectralFluxTimestamps.size() >= expectedSpectralFluxTimestampSize()) {
         spectralFluxTimestamps.pop_back();
     }
-    spectralFluxTimestamps.push_front(currentSTFT.getSampleTimestamp());
+    spectralFluxTimestamps.push_front(currentSTFT.getOriginTimestamp());
 }
 
 float SpecFluxOnsetProcessor::calculateSpectralFlux(const STFTPacket &currentSTFT, const STFTPacket &previousSTFT) {

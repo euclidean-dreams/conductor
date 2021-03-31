@@ -2,9 +2,10 @@
 #define CONDUCTOR_AUDIOMANAGER_H
 
 #include <thread>
-#include <Time.h>
+#include <ImpresarioUtils.h>
 #include "Config.h"
-#include "packet/PacketConduit.h"
+#include "packet/PacketDispatcher.h"
+#include "packet/RawAudioPacket.h"
 #include "audioStream/AudioStream.h"
 #include "audioProcessor/AudioProcessor.h"
 
@@ -13,16 +14,12 @@ namespace conductor {
 class AudioStreamSource : public AudioProcessor {
 private:
     AudioStream &audioStream;
-    std::shared_ptr<PacketConduit> output;
+    std::shared_ptr<PacketDispatcher<RawAudioPacket>> output;
 
 public:
-    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<PacketConduit> output);
-
-    void setup() override {};
+    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<PacketDispatcher<RawAudioPacket>> output);
 
     void process() override;
-
-    bool shouldContinue() override;
 };
 
 }

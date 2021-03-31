@@ -4,11 +4,11 @@
 #include <cmath>
 #include <vector>
 #include "packet/AudioPacket.h"
-#include "packet/NotSerializableException.h"
+#include "packet/FileWritable.h"
 
 namespace conductor {
 
-class STFTPacket : public AudioPacket {
+class STFTPacket : public AudioPacket, public FileWritable  {
 private:
     std::vector<float> real;
     std::vector<float> imaginary;
@@ -19,13 +19,7 @@ private:
     void validateRetrieve(int index) const;
 
 public:
-    static const STFTPacket &from(const Packet &packet);
-
-    STFTPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
-
-    std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
-
-    ImpresarioSerialization::Identifier getIdentifier() const override;
+    STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
 
     void addSample(float realPart, float imaginaryPart);
 
@@ -36,6 +30,8 @@ public:
     float getMagnitude(int index) const;
 
     int size() const;
+
+    void writeToFile(std::ofstream &fileStream) const override;
 };
 
 }

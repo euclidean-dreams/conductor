@@ -2,22 +2,21 @@
 #define CONDUCTOR_ONSETPACKET_H
 
 #include <cstdint>
-#include <Onset_generated.h>
+#include <ImpresarioSerialization.h>
 #include "Config.h"
 #include "packet/AudioPacket.h"
+#include "packet/Serializable.h"
 
 namespace conductor {
 
-class OnsetPacket : public AudioPacket {
+class OnsetPacket : public AudioPacket, public Serializable {
 private:
     uint64_t onsetTimestamp;
     ImpresarioSerialization::OnsetMethod method;
     float confidence;
 
 public:
-    static const OnsetPacket &from(const Packet &packet);
-
-    OnsetPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, uint64_t onsetTimestamp,
+    OnsetPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, uint64_t onsetTimestamp,
                 ImpresarioSerialization::OnsetMethod method, float confidence);
 
     std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;

@@ -58,23 +58,21 @@ set(
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
 
-        src/audioProcessor/fileWriter/FileWriter.cpp src/audioProcessor/fileWriter/FileWriter.h
-        src/audioProcessor/fileWriter/RawAudioFileWriter.cpp src/audioProcessor/fileWriter/RawAudioFileWriter.h
-        src/audioProcessor/fileWriter/STFTFileWriter.cpp src/audioProcessor/fileWriter/STFTFileWriter.h
+        src/audioProcessor/FileWriter.h
 
-        src/packet/PacketConduit.cpp src/packet/PacketConduit.h
-        src/packet/PacketCollectionManager.h
-        src/packet/PacketSpout.cpp src/packet/PacketSpout.h
-        src/packet/PacketCollection.cpp src/packet/PacketCollection.h
+        src/packet/PacketConduit.h
+        src/packet/PacketReceiver.h
+        src/packet/PacketDispatcher.h
+        src/packet/PacketCollection.h
 
         src/packet/Packet.h
-        src/packet/NotSerializableException.h
+        src/packet/Serializable.h
+        src/packet/FileWritable.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
         src/packet/STFTPacket.cpp src/packet/STFTPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
-        src/packet/PitchPacket.cpp src/packet/PitchPacket.h
-)
+        src/packet/PacketConduitCurator.cpp src/packet/PacketConduitCurator.h src/packet/Cleanable.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -93,6 +91,17 @@ list(APPEND TARGETS test-conductor)
 add_executable(test-conductor ${TEST_FILES} ${SOURCE_FILES})
 target_link_libraries(test-conductor PRIVATE gtest_main)
 target_link_libraries(test-conductor PRIVATE gmock)
+
+# exp
+set(
+        EXP
+        src/packet/Packet.h
+        src/packet/PacketCollection.h
+
+)
+list(APPEND TARGETS exp-conductor)
+add_executable(exp-conductor ${EXP})
+target_link_libraries(exp-conductor PRIVATE gtest_main)
 
 # finalize
 find_package(cppzmq)

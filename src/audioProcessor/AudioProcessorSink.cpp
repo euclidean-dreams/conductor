@@ -2,7 +2,7 @@
 
 namespace conductor {
 
-AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketSpout> input,
+AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketReceiver<Serializable>> input,
                                        std::unique_ptr<impresarioUtils::NetworkSocket> output)
         : input{move(input)},
           output{move(output)},
@@ -10,19 +10,9 @@ AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketSpout> input,
 
 }
 
-void AudioProcessorSink::setup() {
-
-}
-
 void AudioProcessorSink::process() {
-    auto packets = input->getPackets(1);
-    auto &packet = packets->getPacket(0);
-    auto message = packets->getPacket(0).serialize();
-    output->sendSerializedData(packet.getIdentifier(), *packet.serialize());
-}
-
-bool AudioProcessorSink::shouldContinue() {
-    return true;
+    auto packet = input->getPacket();
+    output->sendSerializedData(packet->getIdentifier(), *packet->serialize());
 }
 
 }

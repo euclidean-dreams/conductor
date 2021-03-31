@@ -3,11 +3,11 @@
 
 #include <mutex>
 #include <pybind11/embed.h>
-#include <NonCopyable.h>
+#include <ImpresarioUtils.h>
 
 namespace conductor {
 
-class PythonInterpreterManager : impresarioUtils::NonCopyable {
+class PythonInterpreterManager : virtual impresarioUtils::NonCopyable {
 private:
     std::mutex mutex;
     pybind11::scoped_interpreter pythonInterpreterGuard;

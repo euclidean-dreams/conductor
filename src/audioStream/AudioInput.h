@@ -4,13 +4,13 @@
 #include <memory>
 #include <portaudio.h>
 #include <pa_linux_alsa.h>
-#include <NonCopyable.h>
+#include <ImpresarioUtils.h>
 #include "RingBuffer.h"
 #include "audioStream/AudioUtils.h"
 
 namespace conductor {
 
-class AudioInput : impresarioUtils::NonCopyable {
+class AudioInput : virtual impresarioUtils::NonCopyable {
 private:
     PaStream *inputStream;
     RingBuffer outputStream;

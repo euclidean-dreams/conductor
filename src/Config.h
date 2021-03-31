@@ -2,8 +2,6 @@
 #define CONDUCTOR_CONFIG_H
 
 #include <string_view>
-#include "OnsetMethod_generated.h"
-#include "PitchMethod_generated.h"
 
 namespace conductor {
 

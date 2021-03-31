@@ -5,20 +5,21 @@
 #include <memory>
 #include <vector>
 #include <zmq.hpp>
-#include <NonCopyable.h>
-#include "audioProcessor/fileWriter/RawAudioFileWriter.h"
-#include "audioProcessor/fileWriter/STFTFileWriter.h"
+#include <ImpresarioUtils.h>
 #include "audioProcessor/BandpassProcessor.h"
 #include "audioProcessor/STFTProcessor.h"
 #include "audioProcessor/AudioStreamSource.h"
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h"
+#include "audioProcessor/FileWriter.h"
 #include "audioStream/AudioStream.h"
 #include "packet/PacketConduit.h"
+#include "packet/PacketConduitCurator.h"
+#include "packet/FileWritable.h"
 
 namespace conductor {
 
-class AudioProcessorSuite : impresarioUtils::NonCopyable {
+class AudioProcessorSuite : virtual impresarioUtils::NonCopyable {
 private:
     inline static const std::string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
     inline static const std::string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
@@ -70,6 +71,7 @@ private:
     };
 
     std::vector<std::unique_ptr<AudioProcessor>> audioProcessors;
+    std::unique_ptr<PacketConduitCurator> packetConduitCurator;
 
 public:
     AudioProcessorSuite(zmq::context_t &context, AudioStream &audioStream);

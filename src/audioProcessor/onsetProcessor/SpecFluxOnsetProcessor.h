@@ -1,16 +1,16 @@
 #ifndef CONDUCTOR_SPECFLUXONSETPROCESSOR_H
 #define CONDUCTOR_SPECFLUXONSETPROCESSOR_H
 
-#include <Time.h>
-#include <NetworkSocket.h>
-#include <Onset_generated.h>
-#include <OnsetProcessorParameters_generated.h>
+#include <ImpresarioUtils.h>
+#include <ImpresarioSerialization.h>
 #include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/STFTPacket.h"
 #include "packet/OnsetPacket.h"
 #include "packet/PacketConduit.h"
-#include "packet/PacketSpout.h"
+#include "packet/PacketReceiver.h"
+#include "packet/PacketDispatcher.h"
+#include "packet/AudioPacket.h"
 
 namespace conductor {
 
@@ -20,11 +20,11 @@ private:
     inline static const int DEFAULT_PEAK_PICKING_WINDOW_SIZE = 3;
     inline static const int DEFAULT_PEAK_PICKING_WINDOW_TAIL_MULTIPLIER = 3;
 
-    std::unique_ptr<PacketSpout> input;
-    std::shared_ptr<PacketConduit> output;
+    std::unique_ptr<PacketReceiver<STFTPacket>> input;
+    std::shared_ptr<PacketDispatcher<Serializable>> output;
     std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket;
     ImpresarioSerialization::FrequencyBand frequencyBand;
-    std::shared_ptr<const Packet> previousPacket;
+    std::shared_ptr<const STFTPacket> previousPacket;
     std::list<float> spectralFluxCatalog;
     std::_List_const_iterator<float> targetSpectralFluxIterator;
     std::list<uint64_t> spectralFluxTimestamps;
@@ -49,13 +49,10 @@ private:
     bool onsetDetected();
 
 public:
-    SpecFluxOnsetProcessor(std::unique_ptr<PacketSpout> input, std::shared_ptr<PacketConduit> output,
+    SpecFluxOnsetProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
+                           std::shared_ptr<PacketDispatcher<Serializable>> output,
                            std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                            ImpresarioSerialization::FrequencyBand frequencyBand);
-
-    void setup() override;
-
-    bool shouldContinue() override;
 
     void process() override;
 };

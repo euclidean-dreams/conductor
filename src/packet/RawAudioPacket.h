@@ -3,11 +3,11 @@
 
 #include <vector>
 #include "packet/AudioPacket.h"
-#include "packet/NotSerializableException.h"
+#include "packet/FileWritable.h"
 
 namespace conductor {
 
-class RawAudioPacket : public AudioPacket {
+class RawAudioPacket : public AudioPacket, public FileWritable {
 private:
     std::vector<float> data;
     int maxSize;
@@ -15,19 +15,15 @@ private:
     bool finalized;
 
 public:
-    static const RawAudioPacket &from(const Packet &packet);
-
-    RawAudioPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
-
-    std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
-
-    ImpresarioSerialization::Identifier getIdentifier() const override;
+    RawAudioPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
 
     void addSample(float sample);
 
     float getSample(int index) const;
 
     int size() const;
+
+    void writeToFile(std::ofstream &fileStream) const override;
 };
 
 }

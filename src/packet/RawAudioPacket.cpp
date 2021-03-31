@@ -2,26 +2,14 @@
 
 namespace conductor {
 
-const RawAudioPacket &RawAudioPacket::from(const Packet &packet) {
-    return dynamic_cast<const RawAudioPacket &>(packet);
-}
-
-RawAudioPacket::RawAudioPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
+RawAudioPacket::RawAudioPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
                                int size)
-        : AudioPacket{sampleTimestamp, frequencyBand},
+        : AudioPacket{originTimestamp, frequencyBand},
           data{},
           maxSize{size},
           addIndex{0},
           finalized{false} {
     data.reserve(maxSize);
-}
-
-std::unique_ptr<flatbuffers::FlatBufferBuilder> RawAudioPacket::serialize() const {
-    throw NotSerializableException();
-}
-
-ImpresarioSerialization::Identifier RawAudioPacket::getIdentifier() const {
-    throw NotSerializableException();
 }
 
 void RawAudioPacket::addSample(float sample) {
@@ -47,6 +35,14 @@ float RawAudioPacket::getSample(int index) const {
 
 int RawAudioPacket::size() const {
     return maxSize;
+}
+
+void RawAudioPacket::writeToFile(std::ofstream &fileStream) const {
+    auto outputBuffer = std::make_unique<float[]>(maxSize);
+    for (int index = 0; index < maxSize; index++) {
+        outputBuffer[index] = getSample(index);
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), maxSize * sizeof(float));
 }
 
 }

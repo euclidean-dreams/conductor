@@ -2,12 +2,8 @@
 
 namespace conductor {
 
-const STFTPacket &STFTPacket::from(const Packet &packet) {
-    return dynamic_cast<const STFTPacket &>(packet);
-}
-
-STFTPacket::STFTPacket(uint64_t sampleTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size)
-        : AudioPacket{sampleTimestamp, frequencyBand},
+STFTPacket::STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size)
+        : AudioPacket{originTimestamp, frequencyBand},
           real{},
           imaginary{},
           maxSize{size},
@@ -15,14 +11,6 @@ STFTPacket::STFTPacket(uint64_t sampleTimestamp, ImpresarioSerialization::Freque
           finalized{false} {
     real.reserve(maxSize);
     imaginary.reserve(maxSize);
-}
-
-std::unique_ptr<flatbuffers::FlatBufferBuilder> STFTPacket::serialize() const {
-    throw NotSerializableException();
-}
-
-ImpresarioSerialization::Identifier STFTPacket::getIdentifier() const {
-    throw NotSerializableException();
 }
 
 void STFTPacket::addSample(float realPart, float imaginaryPart) {
@@ -63,6 +51,14 @@ float STFTPacket::getMagnitude(int index) const {
 
 int STFTPacket::size() const {
     return maxSize;
+}
+
+void STFTPacket::writeToFile(std::ofstream &fileStream) const {
+    auto outputBuffer = std::make_unique<float[]>(maxSize);
+    for (int index = 0; index < maxSize; index++) {
+        outputBuffer[index] = getMagnitude(index);
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), maxSize * sizeof(float));
 }
 
 }

@@ -2,12 +2,12 @@
 #define CONDUCTOR_AUDIOSTREAM_H
 
 #include <memory>
-#include <NonCopyable.h>
+#include <ImpresarioUtils.h>
 #include "packet/RawAudioPacket.h"
 
 namespace conductor {
 
-class AudioStream : impresarioUtils::NonCopyable {
+class AudioStream : virtual impresarioUtils::NonCopyable {
 public:
     virtual ~AudioStream() = default;
 
