@@ -52,7 +52,8 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
         auto stftInput = std::make_unique<PacketReceiver<RawAudioPacket>>(*bandpassOutputConduit);
         auto stftOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
         auto stftOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*stftOutputConduit);
-        auto stftProcessor = std::make_unique<STFTProcessor>(move(stftInput), move(stftOutput));
+        auto stftProcessor = std::make_unique<STFTProcessor>(move(stftInput), move(stftOutput),
+                                                             WindowFunction::hamming);
         audioProcessors.push_back(move(stftProcessor));
 
         // stft file writer

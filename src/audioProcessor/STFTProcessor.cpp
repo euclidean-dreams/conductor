@@ -3,9 +3,11 @@
 namespace conductor {
 
 STFTProcessor::STFTProcessor(std::unique_ptr<PacketReceiver<RawAudioPacket>> input,
-                             std::unique_ptr<PacketDispatcher<STFTPacket>> output)
+                             std::unique_ptr<PacketDispatcher<STFTPacket>> output,
+                             WindowFunction windowFunction)
         : input{move(input)},
           output{move(output)},
+          windowFunction{windowFunction},
           fftInput{static_cast<ne10_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_float32_t)))},
           fftOutput{static_cast<ne10_fft_cpx_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_fft_cpx_float32_t)))},
           fftPlan{ne10_fft_alloc_r2c_float32(FFT_SIZE)},
@@ -32,7 +34,13 @@ void STFTProcessor::process() {
         for (auto &packet: *packetCollection) {
             for (int i = 0; i < packet->size(); i++) {
                 auto sample = packet->getSample(i);
-                fftInput[fftInputIndex] = sample * hammingWindow(fftInputIndex);
+                if (windowFunction == WindowFunction::hann) {
+                    fftInput[fftInputIndex] = sample * hannWindow(fftInputIndex);
+                } else if (windowFunction == WindowFunction::hamming) {
+                    fftInput[fftInputIndex] = sample * hammingWindow(fftInputIndex);
+                } else {
+                    throw std::logic_error{"invalid window function selected"};
+                }
                 fftInputIndex++;
             }
         }
@@ -49,6 +57,10 @@ void STFTProcessor::process() {
 
 float STFTProcessor::hammingWindow(int sampleNumber) {
     return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1)));
+}
+
+float STFTProcessor::hannWindow(int sampleNumber) {
+    return static_cast<float>(0.5 * (1 - std::cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1))));
 }
 
 }
