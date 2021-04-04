@@ -1,11 +1,9 @@
 #ifndef CONDUCTOR_CLEANABLE_H
 #define CONDUCTOR_CLEANABLE_H
 
-#include <ImpresarioUtils.h>
-
 namespace conductor {
 
-class Cleanable : virtual impresarioUtils::NonCopyable {
+class Cleanable {
 public:
     virtual ~Cleanable() = default;
 

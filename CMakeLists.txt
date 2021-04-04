@@ -72,7 +72,7 @@ set(
         src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
         src/packet/STFTPacket.cpp src/packet/STFTPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
-        src/packet/PacketConduitCurator.cpp src/packet/PacketConduitCurator.h src/packet/Cleanable.h)
+        src/packet/PacketConduitCurator.cpp src/packet/PacketConduitCurator.h src/packet/Cleanable.h src/audioProcessor/PacketTypeConverter.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 

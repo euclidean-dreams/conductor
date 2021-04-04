@@ -12,6 +12,7 @@
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h"
 #include "audioProcessor/FileWriter.h"
+#include "audioProcessor/PacketTypeConverter.h"
 #include "audioStream/AudioStream.h"
 #include "packet/PacketConduit.h"
 #include "packet/PacketConduitCurator.h"
@@ -22,8 +23,10 @@ namespace conductor {
 class AudioProcessorSuite : virtual impresarioUtils::NonCopyable {
 private:
     inline static const std::string_view PARAMETER_ENDPOINT = "tcp://10.0.0.132:44440";
-    inline static const std::string_view CONDUCTOR_OUTPUT_ENDPOINT = "tcp://*:44441";
+    inline static const std::string_view PERFORMER_OUTPUT_ENDPOINT = "tcp://*:44441";
+    inline static const std::string_view DATA_OUTPUT_ENDPOINT = "tcp://*:44442";
     inline static const bool RECORD_TO_FILES = false;
+    inline static const bool SEND_DATA = true;
     inline static const std::map<
             ImpresarioSerialization::FrequencyBand,
             std::tuple<

@@ -2,11 +2,10 @@
 #define CONDUCTOR_FILEWRITABLE_H
 
 #include <fstream>
-#include <ImpresarioUtils.h>
 
 namespace conductor {
 
-class FileWritable : virtual impresarioUtils::NonCopyable {
+class FileWritable {
 public:
     virtual ~FileWritable() = default;
 

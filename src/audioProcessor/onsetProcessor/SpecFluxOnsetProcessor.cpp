@@ -3,7 +3,7 @@
 namespace conductor {
 
 SpecFluxOnsetProcessor::SpecFluxOnsetProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
-                                               std::shared_ptr<PacketDispatcher<Serializable>> output,
+                                               std::unique_ptr<PacketDispatcher<Serializable>> output,
                                                std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                                                ImpresarioSerialization::FrequencyBand frequencyBand)
         : input{move(input)},

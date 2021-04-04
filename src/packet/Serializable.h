@@ -1,12 +1,11 @@
 #ifndef CONDUCTOR_SERIALIZABLE_H
 #define CONDUCTOR_SERIALIZABLE_H
 
-#include <ImpresarioUtils.h>
 #include <ImpresarioSerialization.h>
 
 namespace conductor {
 
-class Serializable : virtual impresarioUtils::NonCopyable {
+class Serializable {
 public:
     virtual ~Serializable() = default;
 

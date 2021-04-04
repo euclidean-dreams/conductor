@@ -8,7 +8,7 @@
 
 namespace conductor {
 
-class PacketConduitCurator {
+class PacketConduitCurator : impresarioUtils::NonCopyable {
 private:
     inline static const int TICK_INTERVAL_MICROSECONDS = 1000;
 

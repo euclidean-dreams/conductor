@@ -7,7 +7,6 @@
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/STFTPacket.h"
 #include "packet/OnsetPacket.h"
-#include "packet/PacketConduit.h"
 #include "packet/PacketReceiver.h"
 #include "packet/PacketDispatcher.h"
 #include "packet/AudioPacket.h"
@@ -21,7 +20,7 @@ private:
     inline static const int DEFAULT_PEAK_PICKING_WINDOW_TAIL_MULTIPLIER = 3;
 
     std::unique_ptr<PacketReceiver<STFTPacket>> input;
-    std::shared_ptr<PacketDispatcher<Serializable>> output;
+    std::unique_ptr<PacketDispatcher<Serializable>> output;
     std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket;
     ImpresarioSerialization::FrequencyBand frequencyBand;
     std::shared_ptr<const STFTPacket> previousPacket;
@@ -50,7 +49,7 @@ private:
 
 public:
     SpecFluxOnsetProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
-                           std::shared_ptr<PacketDispatcher<Serializable>> output,
+                           std::unique_ptr<PacketDispatcher<Serializable>> output,
                            std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket,
                            ImpresarioSerialization::FrequencyBand frequencyBand);
 

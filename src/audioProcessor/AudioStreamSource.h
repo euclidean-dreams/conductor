@@ -14,7 +14,7 @@ namespace conductor {
 class AudioStreamSource : public AudioProcessor {
 private:
     AudioStream &audioStream;
-    std::shared_ptr<PacketDispatcher<RawAudioPacket>> output;
+    std::unique_ptr<PacketDispatcher<RawAudioPacket>> output;
 
 public:
     AudioStreamSource(AudioStream &audioStream, std::unique_ptr<PacketDispatcher<RawAudioPacket>> output);

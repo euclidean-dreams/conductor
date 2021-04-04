@@ -1,11 +1,9 @@
 #ifndef CONDUCTOR_PACKET_H
 #define CONDUCTOR_PACKET_H
 
-#include <ImpresarioUtils.h>
-
 namespace conductor {
 
-class Packet : virtual impresarioUtils::NonCopyable {
+class Packet {
 public:
     virtual ~Packet() = default;
 };
