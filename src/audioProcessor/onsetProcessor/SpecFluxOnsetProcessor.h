@@ -15,7 +15,7 @@ namespace conductor {
 
 class SpecFluxOnsetProcessor : public AudioProcessor {
 private:
-    inline static const float DEFAULT_THRESHOLD = 0.02;
+    inline static const float DEFAULT_THRESHOLD = 1.0;
     inline static const int DEFAULT_PEAK_PICKING_WINDOW_SIZE = 3;
     inline static const int DEFAULT_PEAK_PICKING_WINDOW_TAIL_MULTIPLIER = 3;
 
