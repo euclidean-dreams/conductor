@@ -26,7 +26,7 @@ private:
     inline static const std::string_view PERFORMER_OUTPUT_ENDPOINT = "tcp://*:44441";
     inline static const std::string_view DATA_OUTPUT_ENDPOINT = "tcp://*:44442";
     inline static const bool RECORD_TO_FILES = false;
-    inline static const bool SEND_DATA = true;
+    inline static const bool SEND_DATA = false;
     inline static const std::map<
             ImpresarioSerialization::FrequencyBand,
             std::tuple<
