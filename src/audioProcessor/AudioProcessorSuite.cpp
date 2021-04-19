@@ -5,7 +5,7 @@ namespace conductor {
 AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &audioStream)
         : audioProcessors{} {
     // general
-    auto parameterEndpoint = static_cast<std::string>(PARAMETER_ENDPOINT);
+    auto config = Config::getInstance();
     packetConduitCurator = std::make_unique<PacketConduitCurator>();
 
     // source
@@ -17,23 +17,42 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     // performer sink
     auto performerSinkInputConduit = std::make_unique<PacketConduit<Serializable>>();
     auto performerSinkInput = std::make_unique<PacketReceiver<Serializable>>(*performerSinkInputConduit);
-    auto performerSinkOutputEndpoint = static_cast<std::string>(PERFORMER_OUTPUT_ENDPOINT);
-    auto performerSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context, performerSinkOutputEndpoint,
+    auto performerSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context,
+                                                                                config.getPerformerOutputEndpoint(),
                                                                                 zmq::socket_type::pub, true);
     auto performerSink = std::make_unique<AudioProcessorSink>(move(performerSinkInput), move(performerSinkOutput));
     audioProcessors.push_back(move(performerSink));
 
     // data sink
     std::unique_ptr<PacketConduit<Serializable>> dataSinkInputConduit;
-    if (SEND_DATA) {
+    if (config.getSendData()) {
         dataSinkInputConduit = std::make_unique<PacketConduit<Serializable>>();
         auto dataSinkInput = std::make_unique<PacketReceiver<Serializable>>(*dataSinkInputConduit);
-        auto dataSinkOutputEndpoint = static_cast<std::string>(DATA_OUTPUT_ENDPOINT);
-        auto dataSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context, dataSinkOutputEndpoint,
+        auto dataSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getDataOutputEndpoint(),
                                                                                zmq::socket_type::pub, true);
         auto dataSink = std::make_unique<AudioProcessorSink>(move(dataSinkInput), move(dataSinkOutput));
         audioProcessors.push_back(move(dataSink));
     }
+
+//    // stft
+//    auto stftInput = std::make_unique<PacketReceiver<RawAudioPacket>>(*audioStreamOutputConduit);
+//    auto stftOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
+//    auto stftOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*stftOutputConduit);
+//    auto stftProcessor = std::make_unique<STFTProcessor>(move(stftInput), move(stftOutput),
+//                                                         WindowFunction::hamming);
+//    audioProcessors.push_back(move(stftProcessor));
+//
+//    // curious onset processor
+//    auto onsetInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
+//    auto onsetOutput = std::make_unique<PacketDispatcher<Serializable>>(*dataSinkInputConduit);
+//    auto onsetParameterSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getParameterEndpoint(),
+//                                                                                 zmq::socket_type::sub, false);
+//    onsetParameterSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::onsetProcessorParameters);
+//    auto onsetProcessor = std::make_unique<CuriousOnsetDetector>(move(onsetInput), move(onsetOutput),
+//                                                                 move(onsetParameterSocket));
+//    audioProcessors.push_back(move(onsetProcessor));
+//
+//    packetConduitCurator->addPacketConduit(move(stftOutputConduit));
 
     // pipeline
     for (const auto &item : SUITE_CONFIGURATION) {
@@ -50,7 +69,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
         audioProcessors.push_back(move(bandpassProcessor));
 
         // audio file writer
-        if (RECORD_TO_FILES) {
+        if (config.getRecordToFiles()) {
             auto fileWriterInput = std::make_unique<PacketReceiver<RawAudioPacket>>(*bandpassOutputConduit);
             auto relativePath = std::string{"raw_audio/"};
             relativePath.append(ImpresarioSerialization::EnumNameFrequencyBand(frequencyBand));
@@ -67,32 +86,11 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
                                                              WindowFunction::hamming);
         audioProcessors.push_back(move(stftProcessor));
 
-        // stft output
-        if (SEND_DATA) {
-            auto packetTypeConverterInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
-            auto packetTypeConverterOutput = std::make_unique<PacketDispatcher<Serializable>>(
-                    *dataSinkInputConduit
-            );
-            auto packetTypeConverter = std::make_unique<PacketTypeConverter<STFTPacket, Serializable>>(
-                    move(packetTypeConverterInput), move(packetTypeConverterOutput)
-            );
-            audioProcessors.push_back(move(packetTypeConverter));
-        }
-
-        // stft file writer
-        if (RECORD_TO_FILES) {
-            auto fileWriterInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
-            auto relativePath = std::string{"stft/"};
-            relativePath.append(ImpresarioSerialization::EnumNameFrequencyBand(frequencyBand));
-            auto fileWriter = std::make_unique<FileWriter<STFTPacket>>(move(fileWriterInput), relativePath);
-            audioProcessors.push_back(move(fileWriter));
-        }
-
         // onset processors
         for (auto method : onsetMethods) {
             auto onsetInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
             auto onsetOutput = std::make_unique<PacketDispatcher<Serializable>>(*performerSinkInputConduit);
-            auto onsetParameterSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, parameterEndpoint,
+            auto onsetParameterSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getParameterEndpoint(),
                                                                                          zmq::socket_type::sub, false);
             onsetParameterSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::onsetProcessorParameters);
             auto onsetProcessor = std::make_unique<SpecFluxOnsetProcessor>(move(onsetInput), move(onsetOutput),
@@ -104,7 +102,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     }
     packetConduitCurator->addPacketConduit(move(audioStreamOutputConduit));
     packetConduitCurator->addPacketConduit(move(performerSinkInputConduit));
-    if (SEND_DATA) {
+    if (config.getSendData()) {
         packetConduitCurator->addPacketConduit(move(dataSinkInputConduit));
     }
 }

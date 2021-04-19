@@ -14,7 +14,7 @@ BandpassProcessor::BandpassProcessor(std::unique_ptr<PacketReceiver<RawAudioPack
     auto maxFrequency = frequencyBandValues.second;
     auto width = maxFrequency - minFrequency;
     auto centerFrequency = width / 2 + minFrequency;
-    filter.setup(SAMPLE_RATE, centerFrequency, width);
+    filter.setup(Config::getInstance().getSampleRate(), centerFrequency, width);
 }
 
 void BandpassProcessor::process() {

@@ -4,14 +4,13 @@
 #include <thread>
 #include <vector>
 #include <ImpresarioUtils.h>
+#include "Config.h"
 #include "packet/Cleanable.h"
 
 namespace conductor {
 
 class PacketConduitCurator : impresarioUtils::NonCopyable {
 private:
-    inline static const int TICK_INTERVAL_MICROSECONDS = 1000;
-
     std::vector<std::unique_ptr<Cleanable>> packetConduits;
 
     void clean();

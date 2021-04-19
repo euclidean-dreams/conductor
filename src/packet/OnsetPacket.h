@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <ImpresarioSerialization.h>
-#include "Config.h"
 #include "packet/AudioPacket.h"
 #include "packet/Serializable.h"
 

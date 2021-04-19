@@ -6,7 +6,7 @@ RingBuffer::RingBuffer(int packetSize)
         : mutex{},
           packetAddedExpectant{},
           packetSize{packetSize},
-          bufferSize{packetSize * BUFFER_SIZE_MULTIPLIER},
+          bufferSize{packetSize * Config::getInstance().getRingBufferSizeMultiplier()},
           internalBuffer(bufferSize),
           readIterator{internalBuffer.cbegin()},
           writeIterator{internalBuffer.begin()} {

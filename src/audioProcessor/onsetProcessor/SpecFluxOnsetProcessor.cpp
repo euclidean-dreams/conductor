@@ -13,9 +13,9 @@ SpecFluxOnsetProcessor::SpecFluxOnsetProcessor(std::unique_ptr<PacketReceiver<ST
           previousPacket{nullptr},
           spectralFluxCatalog{},
           targetSpectralFluxIterator{},
-          threshold{DEFAULT_THRESHOLD},
-          peakPickingWindowSize{DEFAULT_PEAK_PICKING_WINDOW_SIZE},
-          peakPickingWindowTailMultiplier{DEFAULT_PEAK_PICKING_WINDOW_TAIL_MULTIPLIER} {
+          threshold{Config::getInstance().getSpecfluxThreshold()},
+          peakPickingWindowSize{Config::getInstance().getSpecfluxPeakPickingWindowSize()},
+          peakPickingWindowTailMultiplier{Config::getInstance().getSpecfluxPeakPickingWindowTailMultiplier()} {
     spectralFluxCatalog.resize(expectedSpectralFluxCatalogSize(), 0);
     adjustTargetSpectralFluxIterator();
     spectralFluxTimestamps.resize(expectedSpectralFluxTimestampSize(), 0);

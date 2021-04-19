@@ -6,6 +6,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include "Config.h"
 #include "audioStream/AudioInput.h"
+#include "audioStream/AudioFileReader.h"
 #include "audioProcessor/AudioProcessorSuite.h"
 #include "audioStream/AudioUtils.h"
 

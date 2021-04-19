@@ -15,6 +15,23 @@ integrate_cmake_dependency(
 )
 
 integrate_cmake_dependency(
+        NAME json
+        GIT_URL git@github.com:nlohmann/json.git
+        GIT_TAG db78ac1d7716f56fc9f1b030b715f872f93964e4
+)
+
+SET(YAML_CPP_BUILD_TESTS OFF)
+SET(YAML_CPP_INSTALL OFF)
+SET(YAML_MSVC_SHARED_RT OFF)
+SET(YAML_CPP_BUILD_TOOLS OFF)
+SET(YAML_CPP_BUILD_CONTRIB OFF)
+integrate_cmake_dependency(
+        NAME yaml
+        GIT_URL git@github.com:jbeder/yaml-cpp.git
+        GIT_TAG 9a3624205e8774953ef18f57067b3426c1c5ada6
+)
+
+integrate_cmake_dependency(
         NAME iir1
         GIT_URL git@github.com:berndporr/iir1.git
         GIT_TAG 67591c8eac591c576b9aabe9a2f288296bb263f0
@@ -42,24 +59,31 @@ integrate_cmake_dependency(
 # conductor
 set(
         SOURCE_FILES
-        src/Config.h
+        src/Config.cpp src/Config.h
         src/Bootstrapper.cpp src/Bootstrapper.h
 
         src/audioStream/AudioStream.h
         src/audioStream/AudioInput.cpp src/audioStream/AudioInput.h
         src/audioStream/RingBuffer.cpp src/audioStream/RingBuffer.h
+        src/audioStream/AudioFileReader.cpp src/audioStream/AudioFileReader.h
+        src/audioStream/AudioFileStream.cpp src/audioStream/AudioFileStream.h
         src/audioStream/AudioUtils.h src/audioStream/AudioUtils.cpp
 
         src/audioProcessor/AudioProcessor.h
+        src/audioProcessor/PacketTypeConverter.h
         src/audioProcessor/AudioProcessorSuite.cpp src/audioProcessor/AudioProcessorSuite.h
         src/audioProcessor/AudioStreamSource.cpp src/audioProcessor/AudioStreamSource.h
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
+        src/audioProcessor/onsetProcessor/CuriousOnsetDetector.cpp src/audioProcessor/onsetProcessor/CuriousOnsetDetector.h
+        src/audioProcessor/onsetProcessor/CuriousPerceptron.cpp src/audioProcessor/onsetProcessor/CuriousPerceptron.h
 
         src/audioProcessor/FileWriter.h
 
+        src/packet/Cleanable.h
+        src/packet/PacketConduitCurator.cpp src/packet/PacketConduitCurator.h
         src/packet/PacketConduit.h
         src/packet/PacketReceiver.h
         src/packet/PacketDispatcher.h
@@ -71,8 +95,9 @@ set(
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
         src/packet/STFTPacket.cpp src/packet/STFTPacket.h
+        src/packet/SpectrogramPacket.cpp src/packet/SpectrogramPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
-        src/packet/PacketConduitCurator.cpp src/packet/PacketConduitCurator.h src/packet/Cleanable.h src/audioProcessor/PacketTypeConverter.h)
+)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
@@ -112,6 +137,8 @@ foreach (target IN LISTS TARGETS)
     target_link_libraries(${target} PRIVATE impresario-utils)
     target_link_libraries(${target} PRIVATE portaudio)
     target_link_libraries(${target} PRIVATE pthread)
+    target_link_libraries(${target} PRIVATE yaml-cpp)
+    target_link_libraries(${target} PRIVATE nlohmann_json::nlohmann_json)
 
     target_include_directories(${target} PRIVATE ${CMAKE_BINARY_DIR}/ne10-src/inc)
     target_link_libraries(${target} PRIVATE NE10)

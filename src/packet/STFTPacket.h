@@ -9,7 +9,7 @@
 
 namespace conductor {
 
-class STFTPacket : public AudioPacket, public FileWritable, public Serializable {
+class STFTPacket : public AudioPacket {
 private:
     std::vector<float> real;
     std::vector<float> imaginary;
@@ -23,12 +23,6 @@ public:
     STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
 
     STFTPacket(const STFTPacket &original);
-
-    void writeToFile(std::ofstream &fileStream) const override;
-
-    std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
-
-    ImpresarioSerialization::Identifier getIdentifier() const override;
 
     void addSample(float realPart, float imaginaryPart);
 

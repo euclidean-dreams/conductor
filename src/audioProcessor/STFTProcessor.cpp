@@ -8,9 +8,12 @@ STFTProcessor::STFTProcessor(std::unique_ptr<PacketReceiver<RawAudioPacket>> inp
         : input{move(input)},
           output{move(output)},
           windowFunction{windowFunction},
-          fftInput{static_cast<ne10_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_float32_t)))},
-          fftOutput{static_cast<ne10_fft_cpx_float32_t *>(malloc(FFT_SIZE * sizeof(ne10_fft_cpx_float32_t)))},
-          fftPlan{ne10_fft_alloc_r2c_float32(FFT_SIZE)},
+          hopSize{Config::getInstance().getSTFTHopSize()},
+          windowSize{Config::getInstance().getSTFTWindowSize()},
+          fftSize{windowSize * Config::getInstance().getAudioPacketSize()},
+          fftInput{static_cast<ne10_float32_t *>(malloc(fftSize * sizeof(ne10_float32_t)))},
+          fftOutput{static_cast<ne10_fft_cpx_float32_t *>(malloc(fftSize * sizeof(ne10_fft_cpx_float32_t)))},
+          fftPlan{ne10_fft_alloc_r2c_float32(fftSize)},
           currentPackets{} {
 }
 
@@ -22,12 +25,12 @@ STFTProcessor::~STFTProcessor() {
 
 void STFTProcessor::process() {
     if (currentPackets.empty()) {
-        for (int i = 0; i < WINDOW_SIZE / HOP_SIZE; i++) {
-            currentPackets.push_front(input->getPackets(HOP_SIZE));
+        for (int i = 0; i < windowSize / hopSize; i++) {
+            currentPackets.push_front(input->getPackets(hopSize));
         }
     } else {
         currentPackets.pop_back();
-        currentPackets.push_front(input->getPackets(HOP_SIZE));
+        currentPackets.push_front(input->getPackets(hopSize));
     }
     auto fftInputIndex = 0;
     for (auto &packetCollection: currentPackets) {
@@ -48,19 +51,19 @@ void STFTProcessor::process() {
     ne10_fft_r2c_1d_float32_neon(fftOutput, fftInput, fftPlan);
     auto &mostRecentPacket = currentPackets.front()->getPacket(0);
     auto outputPacket = std::make_unique<STFTPacket>(mostRecentPacket.getOriginTimestamp(),
-                                                     mostRecentPacket.getFrequencyBand(), FFT_SIZE / 2 + 1);
-    for (int i = 0; i < FFT_SIZE / 2 + 1; i++) {
+                                                     mostRecentPacket.getFrequencyBand(), fftSize / 2 + 1);
+    for (int i = 0; i < fftSize / 2 + 1; i++) {
         outputPacket->addSample(fftOutput[i].r, fftOutput[i].i);
     }
     output->sendPacket(move(outputPacket));
 }
 
 float STFTProcessor::hammingWindow(int sampleNumber) {
-    return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1)));
+    return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sampleNumber) / (fftSize - 1)));
 }
 
 float STFTProcessor::hannWindow(int sampleNumber) {
-    return static_cast<float>(0.5 * (1 - std::cos((2 * M_PI * sampleNumber) / (FFT_SIZE - 1))));
+    return static_cast<float>(0.5 * (1 - std::cos((2 * M_PI * sampleNumber) / (fftSize - 1))));
 }
 
 }

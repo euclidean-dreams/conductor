@@ -7,6 +7,7 @@
 #include <vector>
 #include <ImpresarioUtils.h>
 #include <ImpresarioSerialization.h>
+#include "Config.h"
 #include "audioStream/AudioStream.h"
 #include "packet/RawAudioPacket.h"
 
@@ -14,8 +15,6 @@ namespace conductor {
 
 class RingBuffer : public AudioStream {
 private:
-    inline static const int BUFFER_SIZE_MULTIPLIER = 16;
-
     std::mutex mutex;
     std::condition_variable packetAddedExpectant;
     int packetSize;

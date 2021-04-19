@@ -6,7 +6,7 @@ AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketReceiver<Serializab
                                        std::unique_ptr<impresarioUtils::NetworkSocket> output)
         : input{move(input)},
           output{move(output)},
-          logger{spdlog::get(static_cast<std::string>(LOGGER_NAME))} {
+          logger{spdlog::get(Config::getInstance().getLoggerName())} {
 
 }
 

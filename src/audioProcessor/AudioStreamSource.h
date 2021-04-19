@@ -3,7 +3,6 @@
 
 #include <thread>
 #include <ImpresarioUtils.h>
-#include "Config.h"
 #include "packet/PacketDispatcher.h"
 #include "packet/RawAudioPacket.h"
 #include "audioStream/AudioStream.h"

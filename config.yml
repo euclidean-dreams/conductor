@@ -1,0 +1,41 @@
+general:
+  logger_name: conductor
+  sample_rate: 44100.00
+  audio_packet_size: 128
+
+# packetry
+packet_conduit_curator:
+  tick_interval: 1000
+
+# audio stream
+ring_buffer:
+  size_multiplier: 16
+
+audio_file_reader:
+  audio_input_file: /root/input/input.raw
+
+# pipeline
+suite:
+  parameter_endpoint: tcp://10.0.0.132:44440
+  performer_output_endpoint: tcp://*:44441
+  data_output_endpoint: tcp://*:44442
+  record_to_files: false
+  send_data: false
+
+# bandpass processor order must be configured from header
+
+stft:
+  hop_size: 4
+  window_size: 32
+
+file_writer:
+  output_file_path: /root/output/
+
+specflux_onset_processor:
+  threshold: 1.0
+  peak_picking_window_size: 3
+  peak_picking_window_tail_multiplier: 3
+
+curious_onset_processor:
+  threshold: 2
+  memory_length: 50
