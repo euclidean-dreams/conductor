@@ -30,6 +30,33 @@ ImpresarioSerialization::Identifier SpectrogramPacket::getIdentifier() const {
     return ImpresarioSerialization::Identifier::spectrogram;
 }
 
+void SpectrogramPacket::writeToFile(std::ofstream &fileStream) const {
+    auto bufferSize = static_cast<int>(magnitudes.size());
+    fileStream.write(reinterpret_cast<char *>(&bufferSize), sizeof(int));
+    auto outputBuffer = std::make_unique<float[]>(bufferSize);
+    for (int index = 0; index < bufferSize; index++) {
+        outputBuffer[index] = magnitudes[index];
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
+    for (int index = 0; index < bufferSize; index++) {
+        outputBuffer[index] = spectralFluxes[index];
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
+    for (int index = 0; index < bufferSize; index++) {
+        outputBuffer[index] = fluxyFluxes[index];
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
+    for (int index = 0; index < bufferSize; index++) {
+        outputBuffer[index] = peaks[index];
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
+    for (int index = 0; index < bufferSize; index++) {
+        outputBuffer[index] = firedCatalog[index];
+    }
+    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
+    std::cout << impresarioUtils::getCurrentTime() << std::endl;
+}
+
 void SpectrogramPacket::addSample(float magnitude, float spectralFlux, float fluxyFlux, float peak, float fired) {
     magnitudes.push_back(magnitude);
     spectralFluxes.push_back(spectralFlux);

@@ -3,7 +3,7 @@
 namespace conductor {
 
 CuriousOnsetDetector::CuriousOnsetDetector(std::unique_ptr<PacketReceiver<STFTPacket>> input,
-                                           std::unique_ptr<PacketDispatcher<Serializable>> output,
+                                           std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output,
                                            std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket)
         : input{move(input)},
           output{move(output)},

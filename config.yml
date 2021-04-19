@@ -19,7 +19,7 @@ suite:
   parameter_endpoint: tcp://10.0.0.132:44440
   performer_output_endpoint: tcp://*:44441
   data_output_endpoint: tcp://*:44442
-  record_to_files: false
+  record_to_files: true
   send_data: false
 
 # bandpass processor order must be configured from header

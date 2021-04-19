@@ -18,7 +18,7 @@ namespace conductor {
 class CuriousOnsetDetector : public AudioProcessor {
 private:
     std::unique_ptr<PacketReceiver<STFTPacket>> input;
-    std::unique_ptr<PacketDispatcher<Serializable>> output;
+    std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output;
     std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket;
     std::list<std::unique_ptr<CuriousPerceptron>> perceptrons;
 
@@ -28,7 +28,7 @@ private:
 
 public:
     CuriousOnsetDetector(std::unique_ptr<PacketReceiver<STFTPacket>> input,
-                         std::unique_ptr<PacketDispatcher<Serializable>> output,
+                         std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output,
                          std::unique_ptr<impresarioUtils::NetworkSocket> parameterSocket);
 
     void process() override;
