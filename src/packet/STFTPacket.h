@@ -4,7 +4,6 @@
 #include <cmath>
 #include <vector>
 #include "packet/AudioPacket.h"
-#include "packet/FileWritable.h"
 #include "packet/Serializable.h"
 
 namespace conductor {

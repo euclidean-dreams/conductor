@@ -2,67 +2,33 @@
 
 namespace conductor {
 
-SpectrogramPacket::SpectrogramPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand)
+SpectrogramPacket::SpectrogramPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
+                                     int layerCount)
         : AudioPacket{originTimestamp, frequencyBand},
-          magnitudes{},
-          spectralFluxes{},
-          fluxyFluxes{},
-          peaks{},
-          firedCatalog{} {
-
-}
-
-std::unique_ptr<flatbuffers::FlatBufferBuilder> SpectrogramPacket::serialize() const {
-    auto builder = std::make_unique<flatbuffers::FlatBufferBuilder>();
-    auto magnitudeOffset = builder->CreateVector(magnitudes);
-    auto spectralFluxOffset = builder->CreateVector(spectralFluxes);
-    auto fluxyFluxOffset = builder->CreateVector(fluxyFluxes);
-    auto peakOffset = builder->CreateVector(peaks);
-    auto firedOffset = builder->CreateVector(firedCatalog);
-    auto serializedPacket = ImpresarioSerialization::CreateSpectrogram(*builder, originTimestamp, magnitudeOffset,
-                                                                       spectralFluxOffset, fluxyFluxOffset, peakOffset,
-                                                                       firedOffset);
-    builder->Finish(serializedPacket);
-    return builder;
-}
-
-ImpresarioSerialization::Identifier SpectrogramPacket::getIdentifier() const {
-    return ImpresarioSerialization::Identifier::spectrogram;
+          layers{} {
+    layers.resize(layerCount);
 }
 
 void SpectrogramPacket::writeToFile(std::ofstream &fileStream) const {
-    auto bufferSize = static_cast<int>(magnitudes.size());
+    auto layerCount = static_cast<int>(layers.size());
+    fileStream.write(reinterpret_cast<char *>(&layerCount), sizeof(int));
+    auto bufferSize = static_cast<int>(layers[0].size());
     fileStream.write(reinterpret_cast<char *>(&bufferSize), sizeof(int));
     auto outputBuffer = std::make_unique<float[]>(bufferSize);
-    for (int index = 0; index < bufferSize; index++) {
-        outputBuffer[index] = magnitudes[index];
+    for (auto &layer: layers) {
+        for (int index = 0; index < bufferSize; index++) {
+            outputBuffer[index] = static_cast<float>(layer[index]);
+        }
+        fileStream.write(
+                reinterpret_cast<char *>(outputBuffer.get()), static_cast<std::streamsize >(bufferSize * sizeof(float))
+        );
     }
-    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
-    for (int index = 0; index < bufferSize; index++) {
-        outputBuffer[index] = spectralFluxes[index];
-    }
-    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
-    for (int index = 0; index < bufferSize; index++) {
-        outputBuffer[index] = fluxyFluxes[index];
-    }
-    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
-    for (int index = 0; index < bufferSize; index++) {
-        outputBuffer[index] = peaks[index];
-    }
-    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
-    for (int index = 0; index < bufferSize; index++) {
-        outputBuffer[index] = firedCatalog[index];
-    }
-    fileStream.write(reinterpret_cast<char *>(outputBuffer.get()), bufferSize * sizeof(float));
-    std::cout << impresarioUtils::getCurrentTime() << std::endl;
 }
 
-void SpectrogramPacket::addSample(float magnitude, float spectralFlux, float fluxyFlux, float peak, float fired) {
-    magnitudes.push_back(magnitude);
-    spectralFluxes.push_back(spectralFlux);
-    fluxyFluxes.push_back(fluxyFlux);
-    peaks.push_back(peak);
-    firedCatalog.push_back(fired);
+void SpectrogramPacket::addData(std::vector<double> &data) {
+    for (int index = 0; index < layers.size(); index++) {
+        layers[index].push_back(data[index]);
+    }
 }
 
 }

@@ -17,7 +17,8 @@ AudioFileReader::AudioFileReader(int packetSize)
         auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(),
                                                        ImpresarioSerialization::FrequencyBand::all, packetSize);
         for (int i = 0; i < packetSize; i++) {
-            packet->addSample(floats[offset + i]);
+            auto sample = floats[offset + i];
+            packet->addSample(sample);
         }
         outputStream.addPacket(move(packet));
     }

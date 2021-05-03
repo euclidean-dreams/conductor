@@ -40,9 +40,6 @@ private:
     int specfluxPeakPickingWindowSize;
     int specfluxPeakPickingWindowTailMultiplier;
 
-    int curiousThreshold;
-    int curiousMemoryLength;
-
     Config();
 
 public:
@@ -83,10 +80,6 @@ public:
     int getSpecfluxPeakPickingWindowSize() const { return specfluxPeakPickingWindowSize; }
 
     int getSpecfluxPeakPickingWindowTailMultiplier() const { return specfluxPeakPickingWindowTailMultiplier; }
-
-    int getCuriousThreshold() const { return curiousThreshold; }
-
-    int getCuriousMemoryLength() const { return curiousMemoryLength; }
 };
 
 }

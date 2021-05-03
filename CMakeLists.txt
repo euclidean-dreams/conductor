@@ -3,6 +3,8 @@ project(conductor VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+option(USE_MUFFT "use mufft instead of ne10 for fft, recommended for x86 architectures" OFF)
+
 add_compile_options(-Wno-psabi)
 
 include(lib/cmake-utils/dependency-integrator.cmake)
@@ -30,24 +32,33 @@ integrate_cmake_dependency(
         GIT_URL git@github.com:jbeder/yaml-cpp.git
         GIT_TAG 9a3624205e8774953ef18f57067b3426c1c5ada6
 )
+if (USE_MUFFT)
+    add_compile_definitions(USE_MUFFT)
+    SET(MUFFT_ENABLE_FFTW OFF)
+    integrate_cmake_dependency(
+            NAME mufft
+            GIT_URL git@github.com:Themaister/muFFT.git
+            GIT_TAG 47bb08652eab399c2c7d460abe5184857110f130
+    )
+else ()
+    SET(GNULINUX_PLATFORM ON)
+    SET(NE10_LINUX_TARGET_ARCH armv7)
+    set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
+    SET(NE10_ENABLE_MATH OFF)
+    SET(NE10_ENABLE_PHYSICS OFF)
+    SET(NE10_ENABLE_IMGPROC OFF)
+    SET(NE10_BUILD_EXAMPLES OFF)
+    integrate_cmake_dependency(
+            NAME ne10
+            GIT_URL git@github.com:projectNe10/Ne10.git
+            GIT_TAG 1f059a764d0e1bc2481c0055c0e71538470baa83
+    )
+endif ()
 
 integrate_cmake_dependency(
         NAME iir1
         GIT_URL git@github.com:berndporr/iir1.git
         GIT_TAG 67591c8eac591c576b9aabe9a2f288296bb263f0
-)
-
-SET(GNULINUX_PLATFORM ON)
-SET(NE10_LINUX_TARGET_ARCH armv7)
-set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
-SET(NE10_ENABLE_MATH OFF)
-SET(NE10_ENABLE_PHYSICS OFF)
-SET(NE10_ENABLE_IMGPROC OFF)
-SET(NE10_BUILD_EXAMPLES OFF)
-integrate_cmake_dependency(
-        NAME ne10
-        GIT_URL git@github.com:projectNe10/Ne10.git
-        GIT_TAG 1f059a764d0e1bc2481c0055c0e71538470baa83
 )
 
 integrate_cmake_dependency(
@@ -76,9 +87,9 @@ set(
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
         src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
+        src/audioProcessor/HarmonicTransformProcessor.cpp src/audioProcessor/HarmonicTransformProcessor.h
+        src/audioProcessor/SpectrogramProcessor.cpp src/audioProcessor/SpectrogramProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
-        src/audioProcessor/onsetProcessor/CuriousOnsetDetector.cpp src/audioProcessor/onsetProcessor/CuriousOnsetDetector.h
-        src/audioProcessor/onsetProcessor/CuriousPerceptron.cpp src/audioProcessor/onsetProcessor/CuriousPerceptron.h
 
         src/audioProcessor/FileWriter.h
 
@@ -97,6 +108,8 @@ set(
         src/packet/STFTPacket.cpp src/packet/STFTPacket.h
         src/packet/SpectrogramPacket.cpp src/packet/SpectrogramPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
+        src/packet/HarmonicTransformPacket.cpp src/packet/HarmonicTransformPacket.h
+
 )
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
@@ -140,6 +153,10 @@ foreach (target IN LISTS TARGETS)
     target_link_libraries(${target} PRIVATE yaml-cpp)
     target_link_libraries(${target} PRIVATE nlohmann_json::nlohmann_json)
 
-    target_include_directories(${target} PRIVATE ${CMAKE_BINARY_DIR}/ne10-src/inc)
-    target_link_libraries(${target} PRIVATE NE10)
+    if (USE_MUFFT)
+        target_link_libraries(${target} PRIVATE muFFT)
+    else ()
+        target_include_directories(${target} PRIVATE ${CMAKE_BINARY_DIR}/ne10-src/inc)
+        target_link_libraries(${target} PRIVATE NE10)
+    endif ()
 endforeach ()

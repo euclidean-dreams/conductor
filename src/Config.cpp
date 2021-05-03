@@ -45,9 +45,6 @@ Config::Config() {
     specfluxThreshold = configFile["specflux_onset_processor"]["threshold"].as<float>();
     specfluxPeakPickingWindowSize = configFile["specflux_onset_processor"]["peak_picking_window_size"].as<int>();
     specfluxPeakPickingWindowTailMultiplier = configFile["specflux_onset_processor"]["peak_picking_window_tail_multiplier"].as<int>();
-
-    curiousThreshold = configFile["curious_onset_processor"]["threshold"].as<int>();
-    curiousMemoryLength = configFile["curious_onset_processor"]["memory_length"].as<int>();
 }
 
 }
