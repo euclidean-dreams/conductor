@@ -6,34 +6,34 @@ HarmonicTransformProcessor::HarmonicTransformProcessor(std::unique_ptr<PacketRec
                                                        std::unique_ptr<PacketDispatcher<HarmonicTransformPacket>> output)
         : input{move(input)},
           output{move(output)},
-          correlationSignalSnapshots{},
-          squishFactor{2},
-          maxPartials{10},
+          harmonicSignalSnapshots{},
+          squishFactor{2.0},
+          maxPartials{5},
           considerationOffset{3 * static_cast<int>(std::floor(squishFactor))},
-          initialPhi{10},
+          initialPhi{3},
           maxPhiDivisor{2},
-          correlationSignalMagnitudeMultiplier{100},
-          correlationSignalPeakDecay{0.1} {
-    initializeCorrelationSignalSnapshots();
-    initializeLowPhiCorrelationSignals();
+          harmonicSignalMagnitudeMultiplier{100},
+          harmonicSignalPeakDecay{0.1} {
+    initializeHarmonicSignalSnapshots();
+    initializeLowPhiHarmonicSignals();
 }
 
-void HarmonicTransformProcessor::initializeCorrelationSignalSnapshots() {
-    correlationSignalSnapshots.reserve(maxPartials);
+void HarmonicTransformProcessor::initializeHarmonicSignalSnapshots() {
+    harmonicSignalSnapshots.reserve(maxPartials);
     for (int n = 1; n <= maxPartials; n++) {
-        correlationSignalSnapshots.emplace_back();
-        auto &result = correlationSignalSnapshots[n - 1];
+        harmonicSignalSnapshots.emplace_back();
+        auto &result = harmonicSignalSnapshots[n - 1];
         result.reserve(2 * considerationOffset + 1);
         for (int x = 0; x < 2 * considerationOffset + 1; x++) {
             auto component = static_cast<double>(x - considerationOffset) / squishFactor;
-            auto value = -correlationSignalMagnitudeMultiplier * component / std::pow(n, correlationSignalPeakDecay)
+            auto value = -harmonicSignalMagnitudeMultiplier * component / std::pow(n, harmonicSignalPeakDecay)
                          * std::exp(-std::pow(component, 2));
             result.push_back(value);
         }
     }
 }
 
-void HarmonicTransformProcessor::initializeLowPhiCorrelationSignals() {
+void HarmonicTransformProcessor::initializeLowPhiHarmonicSignals() {
     lowPhiCorrelationSignals.reserve(2 * considerationOffset);
     for (int i = 0; i < initialPhi; i++) {
         lowPhiCorrelationSignals.emplace_back();
@@ -47,9 +47,9 @@ void HarmonicTransformProcessor::initializeLowPhiCorrelationSignals() {
             auto result = 0.0;
             for (int n = 1; n <= maxPartials; n++) {
                 auto component = static_cast<double>(x - n * phi) / squishFactor;
-                result += -component / std::pow(n, correlationSignalPeakDecay) * std::exp(-std::pow(component, 2));
+                result += -component / std::pow(n, harmonicSignalPeakDecay) * std::exp(-std::pow(component, 2));
             }
-            signal.push_back(result * correlationSignalMagnitudeMultiplier);
+            signal.push_back(result * harmonicSignalMagnitudeMultiplier);
         }
     }
 }
@@ -87,7 +87,8 @@ void HarmonicTransformProcessor::process() {
         if (phi <= 2 * considerationOffset) {
             // consideration windows overlap, cannot optimize
             auto &correlationSignal = lowPhiCorrelationSignals[phi];
-            for (int index = 0; index < correlationSignal.size(); index++) {
+            auto lastIndex = phi * maxPartials + considerationOffset;
+            for (int index = 0; index <= lastIndex; index++) {
                 harmonicIntegral += correlationSignal[index] * signalDerivative[index];
             }
         } else {
@@ -97,7 +98,7 @@ void HarmonicTransformProcessor::process() {
                  peakIndex += phi) {
                 int firstIndex = peakIndex - considerationOffset;
                 int lastIndex = peakIndex + considerationOffset;
-                auto &correlationSignal = correlationSignalSnapshots[peakIndex / phi - 1];
+                auto &correlationSignal = harmonicSignalSnapshots[peakIndex / phi - 1];
                 for (int index = firstIndex; index <= lastIndex; index++) {
                     harmonicIntegral += signalDerivative[index] * correlationSignal[index - firstIndex];
                 }

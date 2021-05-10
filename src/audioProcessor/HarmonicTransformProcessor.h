@@ -14,19 +14,19 @@ class HarmonicTransformProcessor : public AudioProcessor {
 private:
     std::unique_ptr<PacketReceiver<STFTPacket>> input;
     std::unique_ptr<PacketDispatcher<HarmonicTransformPacket>> output;
-    std::vector<std::vector<double>> correlationSignalSnapshots;
+    std::vector<std::vector<double>> harmonicSignalSnapshots;
     std::vector<std::vector<double>> lowPhiCorrelationSignals;
     double squishFactor;
     int maxPartials;
     int considerationOffset;
     int initialPhi;
     int maxPhiDivisor;
-    double correlationSignalMagnitudeMultiplier;
-    double correlationSignalPeakDecay;
+    double harmonicSignalMagnitudeMultiplier;
+    double harmonicSignalPeakDecay;
 
-    void initializeCorrelationSignalSnapshots();
+    void initializeHarmonicSignalSnapshots();
 
-    void initializeLowPhiCorrelationSignals();
+    void initializeLowPhiHarmonicSignals();
 
 public:
     HarmonicTransformProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
