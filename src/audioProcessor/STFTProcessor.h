@@ -46,9 +46,9 @@ private:
 #endif // USE_MUFFT
     std::list<std::unique_ptr<PacketCollection<RawAudioPacket>>> currentPackets;
 
-    float hammingWindow(int sampleNumber);
+    float hammingWindow(int sampleNumber) const;
 
-    float hannWindow(int sampleNumber);
+    float hannWindow(int sampleNumber) const;
 
 public:
     STFTProcessor(std::unique_ptr<PacketReceiver<RawAudioPacket>> input,

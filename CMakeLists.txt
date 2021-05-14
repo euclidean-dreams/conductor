@@ -90,6 +90,7 @@ set(
         src/audioProcessor/HarmonicTransformProcessor.cpp src/audioProcessor/HarmonicTransformProcessor.h
         src/audioProcessor/SpectrogramProcessor.cpp src/audioProcessor/SpectrogramProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
+        src/audioProcessor/DisplaySignalProcessor.cpp src/audioProcessor/DisplaySignalProcessor.h
 
         src/audioProcessor/FileWriter.h
 
@@ -103,12 +104,14 @@ set(
         src/packet/Packet.h
         src/packet/Serializable.h
         src/packet/FileWritable.h
+        src/packet/Signal.h
         src/packet/AudioPacket.cpp src/packet/AudioPacket.h
         src/packet/RawAudioPacket.cpp src/packet/RawAudioPacket.h
         src/packet/STFTPacket.cpp src/packet/STFTPacket.h
         src/packet/SpectrogramPacket.cpp src/packet/SpectrogramPacket.h
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
         src/packet/HarmonicTransformPacket.cpp src/packet/HarmonicTransformPacket.h
+        src/packet/DisplaySignalPacket.cpp src/packet/DisplaySignalPacket.h
 
 )
 list(APPEND TARGETS conductor)

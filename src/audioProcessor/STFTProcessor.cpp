@@ -75,19 +75,20 @@ void STFTProcessor::process() {
                                                      mostRecentPacket.getFrequencyBand(), fftSize / 2 + 1);
     for (int i = 0; i < fftSize / 2 + 1; i++) {
 #ifdef USE_MUFFT
-        outputPacket->addSample(fftOutput[i].real, fftOutput[i].imag);
+        auto sample = std::complex<float>(fftOutput[i].real, fftOutput[i].imag);
 #else
-        outputPacket->addSample(fftOutput[i].r, fftOutput[i].i);
+        auto sample = std::complex<float>(fftOutput[i].r, fftOutput[i].i);
 #endif // USE_MUFFT
+        outputPacket->addSample(sample);
     }
     output->sendPacket(move(outputPacket));
 }
 
-float STFTProcessor::hammingWindow(int sampleNumber) {
+float STFTProcessor::hammingWindow(int sampleNumber) const {
     return static_cast<float>(0.53836 - 0.46164 * std::cos((2 * M_PI * sampleNumber) / (fftSize - 1)));
 }
 
-float STFTProcessor::hannWindow(int sampleNumber) {
+float STFTProcessor::hannWindow(int sampleNumber) const {
     return static_cast<float>(0.5 * (1 - std::cos((2 * M_PI * sampleNumber) / (fftSize - 1))));
 }
 
