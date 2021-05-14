@@ -1,7 +1,6 @@
 #ifndef CONDUCTOR_HARMONICTRANSFORMPROCESSOR_H
 #define CONDUCTOR_HARMONICTRANSFORMPROCESSOR_H
 
-#include <iostream>
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/PacketDispatcher.h"
 #include "packet/PacketReceiver.h"

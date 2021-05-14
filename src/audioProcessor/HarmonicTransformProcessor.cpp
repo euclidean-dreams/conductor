@@ -57,7 +57,6 @@ void HarmonicTransformProcessor::initializeLowPhiHarmonicSignals() {
 void HarmonicTransformProcessor::process() {
     auto currentPacket = input->getPacket();
     auto &currentSTFT = *currentPacket;
-    auto startTime = impresarioUtils::getCurrentTime();
 
     // calculate signal derivative
     std::vector<double> signalDerivative;
@@ -107,8 +106,6 @@ void HarmonicTransformProcessor::process() {
         auto harmonicOutput = harmonicIntegral / static_cast<float>(signalDerivative.size());
         outputPacket->addSample(harmonicOutput);
     }
-    auto endTime = impresarioUtils::getElapsedTime(startTime);
-    std::cout << endTime << std::endl;
     output->sendPacket(move(outputPacket));
 }
 
