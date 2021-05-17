@@ -15,6 +15,7 @@ private:
     std::string loggerName;
     float sampleRate;
     int audioPacketSize;
+    bool realTimeInput;
 
     // packetry
     int packetConduitCuratorTickInterval;
@@ -50,6 +51,8 @@ public:
     std::string getLoggerName() const { return loggerName; }
 
     float getSampleRate() const { return sampleRate; }
+
+    bool getRealTimeInput() const { return realTimeInput; }
 
     int getAudioPacketSize() const { return audioPacketSize; }
 

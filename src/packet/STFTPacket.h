@@ -10,9 +10,10 @@ namespace conductor {
 class STFTPacket : public AudioPacket {
 private:
     Signal<std::complex<float>> signal;
+    int fftSize;
 
 public:
-    STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
+    STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size, int fftSize);
 
     STFTPacket(const STFTPacket &original);
 
@@ -23,6 +24,8 @@ public:
     float getMagnitude(int index) const;
 
     int size() const;
+
+    int getFFTSize() const;
 };
 
 }

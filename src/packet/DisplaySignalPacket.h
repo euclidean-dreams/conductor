@@ -20,6 +20,10 @@ public:
     ImpresarioSerialization::Identifier getIdentifier() const override;
 
     void addSample(float sample);
+
+    float getSample(int index) const;
+
+    int size() const;
 };
 
 }

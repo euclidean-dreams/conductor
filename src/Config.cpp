@@ -21,6 +21,7 @@ Config::Config() {
     loggerName = configFile["general"]["logger_name"].as<std::string>();
     sampleRate = configFile["general"]["sample_rate"].as<float>();
     audioPacketSize = configFile["general"]["audio_packet_size"].as<int>();
+    realTimeInput = configFile["general"]["real_time_input"].as<bool>();
 
     // packetry
     packetConduitCuratorTickInterval = configFile["packet_conduit_curator"]["tick_interval"].as<int>();

@@ -25,4 +25,12 @@ void DisplaySignalPacket::addSample(float sample) {
     signal.addSample(sample);
 }
 
+float DisplaySignalPacket::getSample(int index) const {
+    return signal.getSample(index);
+}
+
+int DisplaySignalPacket::size() const {
+    return signal.size();
+}
+
 }

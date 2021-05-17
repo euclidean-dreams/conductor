@@ -53,10 +53,33 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     );
     audioProcessors.push_back(move(harmonicTransformProcessor));
 
+    // mel filterbank
+    auto melFilterbankInput = std::make_unique<PacketReceiver<HarmonicTransformPacket>>(
+            *harmonicTransformOutputConduit
+            );
+    auto melFilterbankOutputConduit = std::make_unique<PacketConduit<MelSignalPacket>>();
+    auto melFilterbankOutput = std::make_unique<PacketDispatcher<MelSignalPacket>>(
+            *melFilterbankOutputConduit
+    );
+    auto melFilterbankProcessor = std::make_unique<MelFilterbankProcessor>(
+            move(melFilterbankInput), move(melFilterbankOutput)
+    );
+    audioProcessors.push_back(move(melFilterbankProcessor));
+
+    // display signal processor
+    auto displaySignalInput = std::make_unique<PacketReceiver<MelSignalPacket>>(
+            *melFilterbankOutputConduit
+    );
+    auto displaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*performerSinkInputConduit);
+    auto displaySignalProcessor = std::make_unique<DisplaySignalProcessor>(
+            move(displaySignalInput), move(displaySignalOutput)
+    );
+    audioProcessors.push_back(move(displaySignalProcessor));
+
     // spectrogram output
     if (config.getRecordToFiles()) {
-        auto spectrogramInput = std::make_unique<PacketReceiver<HarmonicTransformPacket>>(
-                *harmonicTransformOutputConduit
+        auto spectrogramInput = std::make_unique<PacketReceiver<MelSignalPacket>>(
+                *melFilterbankOutputConduit
         );
         auto spectrogramOutputConduit = std::make_unique<PacketConduit<SpectrogramPacket>>();
         auto spectrogramOutput = std::make_unique<PacketDispatcher<SpectrogramPacket>>(*spectrogramOutputConduit);
@@ -75,6 +98,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     // packet conduit curation
     packetConduitCurator->addPacketConduit(move(stftOutputConduit));
     packetConduitCurator->addPacketConduit(move(harmonicTransformOutputConduit));
+    packetConduitCurator->addPacketConduit(move(melFilterbankOutputConduit));
     packetConduitCurator->addPacketConduit(move(audioStreamOutputConduit));
     packetConduitCurator->addPacketConduit(move(performerSinkInputConduit));
     if (config.getSendData()) {

@@ -91,7 +91,7 @@ set(
         src/audioProcessor/SpectrogramProcessor.cpp src/audioProcessor/SpectrogramProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
         src/audioProcessor/DisplaySignalProcessor.cpp src/audioProcessor/DisplaySignalProcessor.h
-
+        src/audioProcessor/MelFilterbankProcessor.cpp src/audioProcessor/MelFilterbankProcessor.h
         src/audioProcessor/FileWriter.h
 
         src/packet/Cleanable.h
@@ -112,7 +112,7 @@ set(
         src/packet/OnsetPacket.cpp src/packet/OnsetPacket.h
         src/packet/HarmonicTransformPacket.cpp src/packet/HarmonicTransformPacket.h
         src/packet/DisplaySignalPacket.cpp src/packet/DisplaySignalPacket.h
-
+        src/packet/MelSignalPacket.cpp src/packet/MelSignalPacket.h
 )
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})

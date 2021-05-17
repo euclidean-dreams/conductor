@@ -1,22 +1,26 @@
 #ifndef CONDUCTOR_DISPLAYSIGNALPROCESSOR_H
 #define CONDUCTOR_DISPLAYSIGNALPROCESSOR_H
 
+#include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
-#include "packet/Serializable.h"
 #include "packet/PacketDispatcher.h"
 #include "packet/PacketReceiver.h"
-#include "packet/HarmonicTransformPacket.h"
-#include "packet/HarmonicTransformPacket.h"
+#include "packet/Serializable.h"
+#include "packet/MelSignalPacket.h"
+#include "packet/DisplaySignalPacket.h"
 
 namespace conductor {
 
-class DisplaySignalProcessor: public AudioProcessor {
+class DisplaySignalProcessor : public AudioProcessor {
 private:
-    std::unique_ptr<PacketReceiver<STFTPacket>> input;
+    std::unique_ptr<PacketReceiver<MelSignalPacket>> input;
     std::unique_ptr<PacketDispatcher<Serializable>> output;
-    std::vector<std::vector<double>> harmonicSignalSnapshots;
-    std::vector<std::vector<double>> lowPhiCorrelationSignals;
 
+public:
+    DisplaySignalProcessor(std::unique_ptr<PacketReceiver<MelSignalPacket>> input,
+                           std::unique_ptr<PacketDispatcher<Serializable>> output);
+
+    void process() override;
 };
 
 }

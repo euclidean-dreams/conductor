@@ -2,7 +2,7 @@
 
 namespace conductor {
 
-SpectrogramProcessor::SpectrogramProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
+SpectrogramProcessor::SpectrogramProcessor(std::unique_ptr<PacketReceiver<MelSignalPacket>> input,
                                            std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output)
         : input{move(input)},
           output{move(output)},
@@ -15,7 +15,8 @@ void SpectrogramProcessor::process() {
         lastPacket = input->getPacket();
     }
     auto packet = input->getPacket();
-    auto &harmonicTransform = *packet;;
+    auto &melSignal = *packet;
+    auto &harmonicTransform = melSignal.getHarmonicTransformPacket();
     auto &stft = harmonicTransform.getSTFTPacket();
 
     std::vector<double> signalDerivative{};
@@ -32,7 +33,7 @@ void SpectrogramProcessor::process() {
     std::vector<double> horizontalHarmonicDerivative{};
     horizontalHarmonicDerivative.reserve(harmonicTransform.size());
     for (int index = 0; index < harmonicTransform.size(); index++) {
-        auto derivative = harmonicTransform.getSample(index) - (*lastPacket).getSample(index);
+        auto derivative = harmonicTransform.getSample(index) - (*lastPacket).getHarmonicTransformPacket().getSample(index);
         horizontalHarmonicDerivative.push_back(derivative);
     }
 
@@ -57,7 +58,8 @@ void SpectrogramProcessor::process() {
     horizontalScaledDerivative.reserve(harmonicTransform.size());
     for (int index = 0; index < harmonicTransform.size(); index++) {
         auto derivative = harmonicallyScaledSignal[index]
-                          - ((*lastPacket).getSample(index) * (*lastPacket).getSTFTPacket().getMagnitude(index));
+                          - ((*lastPacket).getHarmonicTransformPacket().getSample(index)
+                             * (*lastPacket).getHarmonicTransformPacket().getSTFTPacket().getMagnitude(index));
         horizontalScaledDerivative.push_back(derivative);
     }
 
@@ -72,7 +74,7 @@ void SpectrogramProcessor::process() {
         }
     }
 
-    auto layerCount = 5;
+    auto layerCount = 6;
     auto outputSpectrogramPacket = std::make_unique<SpectrogramPacket>(
             harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), layerCount
     );
@@ -94,7 +96,7 @@ void SpectrogramProcessor::process() {
                 && verticalScaledDerivative[index] > 0
                 && harmonicallyScaledSignal[index] > 50) {
                 outputData[4] = harmonicallyScaledSignal[index];
-                fireCount ++;
+                fireCount++;
             } else {
                 outputData[4] = 0;
             }
@@ -102,6 +104,11 @@ void SpectrogramProcessor::process() {
             outputData[4] = 0;
         }
         outputSpectrogramPacket->addData(outputData);
+        if (index < melSignal.size()) {
+            outputData[5] = melSignal.getSample(index);
+        } else {
+            outputData[5] = 0;
+        }
     }
     output->sendPacket(move(outputSpectrogramPacket));
     std::cout << "w" << std::endl;
