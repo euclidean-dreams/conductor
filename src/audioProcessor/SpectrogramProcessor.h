@@ -12,12 +12,12 @@ namespace conductor {
 
 class SpectrogramProcessor : public AudioProcessor {
 private:
-    std::unique_ptr<PacketReceiver<MelSignalPacket>> input;
+    std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input;
     std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output;
-    std::shared_ptr<const MelSignalPacket> lastPacket;
+    std::shared_ptr<const HarmonicTransformPacket> lastPacket;
 
 public:
-    SpectrogramProcessor(std::unique_ptr<PacketReceiver<MelSignalPacket>> input,
+    SpectrogramProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
                          std::unique_ptr<PacketDispatcher<SpectrogramPacket>> output);
 
     void process() override;

@@ -14,6 +14,7 @@
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h"
 #include "audioProcessor/HarmonicTransformProcessor.h"
+#include "audioProcessor/SpecfluxMunger.h"
 #include "audioProcessor/SpectrogramProcessor.h"
 #include "audioProcessor/FileWriter.h"
 #include "audioProcessor/PacketTypeConverter.h"
