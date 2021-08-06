@@ -74,7 +74,7 @@ void SpectrogramProcessor::process() {
         }
     }
 
-    auto layerCount = 6;
+    auto layerCount = 3;
     auto outputSpectrogramPacket = std::make_unique<SpectrogramPacket>(
             harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), layerCount
     );
@@ -87,28 +87,28 @@ void SpectrogramProcessor::process() {
             outputData[1] = 0;
         }
         outputData[2] = harmonicallyScaledSignal[index];
-        outputData[3] = verticalScaledDerivative[index];
-
-//        // playground
-        auto fireCount = 0;
-        if (index < harmonicTransform.size() - 1) {
-            if (verticalScaledDerivative[index + 1] <= 0
-                && verticalScaledDerivative[index] > 0
-                && harmonicallyScaledSignal[index] > 50) {
-                outputData[4] = harmonicallyScaledSignal[index];
-                fireCount++;
-            } else {
-                outputData[4] = 0;
-            }
-        } else {
-            outputData[4] = 0;
-        }
+//        outputData[3] = verticalScaledDerivative[index];
+//
+////        // playground
+//        auto fireCount = 0;
+//        if (index < harmonicTransform.size() - 1) {
+//            if (verticalScaledDerivative[index + 1] <= 0
+//                && verticalScaledDerivative[index] > 0
+//                && harmonicallyScaledSignal[index] > 50) {
+//                outputData[4] = harmonicallyScaledSignal[index];
+//                fireCount++;
+//            } else {
+//                outputData[4] = 0;
+//            }
+//        } else {
+//            outputData[4] = 0;
+//        }
+//        if (index < melSignal.size()) {
+//            outputData[5] = melSignal.getSample(index);
+//        } else {
+//            outputData[5] = 0;
+//        }
         outputSpectrogramPacket->addData(outputData);
-        if (index < melSignal.size()) {
-            outputData[5] = melSignal.getSample(index);
-        } else {
-            outputData[5] = 0;
-        }
     }
     output->sendPacket(move(outputSpectrogramPacket));
     std::cout << "w" << std::endl;

@@ -19,6 +19,7 @@
 #include "audioProcessor/PacketTypeConverter.h"
 #include "audioProcessor/DisplaySignalProcessor.h"
 #include "audioProcessor/MelFilterbankProcessor.h"
+#include "audioProcessor/EqualizerProcessor.h"
 #include "packet/PacketConduit.h"
 #include "packet/PacketConduitCurator.h"
 #include "packet/FileWritable.h"

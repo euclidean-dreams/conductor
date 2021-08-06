@@ -1,6 +1,7 @@
 #ifndef CONDUCTOR_CONFIG_H
 #define CONDUCTOR_CONFIG_H
 
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
@@ -34,6 +35,8 @@ private:
 
     int stftHopSize;
     int stftWindowSize;
+
+    std::map<int, float> equalizerScalingFactors;
 
     std::string outputFilePath;
 
@@ -75,6 +78,8 @@ public:
     int getSTFTHopSize() const { return stftHopSize; }
 
     int getSTFTWindowSize() const { return stftWindowSize; }
+
+    std::map<int, float> getEqualizerScalingValues() const { return equalizerScalingFactors; }
 
     std::string getOutputFilePath() const { return outputFilePath; }
 

@@ -22,6 +22,7 @@ private:
     int maxPhiDivisor;
     double harmonicSignalMagnitudeMultiplier;
     double harmonicSignalPeakDecay;
+    std::shared_ptr<const STFTPacket> lastPacket;
 
     void initializeHarmonicSignalSnapshots();
 

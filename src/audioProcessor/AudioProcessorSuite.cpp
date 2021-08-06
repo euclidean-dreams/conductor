@@ -42,8 +42,15 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
                                                          WindowFunction::hamming);
     audioProcessors.push_back(move(stftProcessor));
 
+    // equalizer
+    auto equalizerInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
+    auto equalizerOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
+    auto equalizerOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*equalizerOutputConduit);
+    auto equalizerProcessor = std::make_unique<EqualizerProcessor>(move(equalizerInput), move(equalizerOutput));
+    audioProcessors.push_back(move(equalizerProcessor));
+
     // harmonic transform
-    auto harmonicTransformInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
+    auto harmonicTransformInput = std::make_unique<PacketReceiver<STFTPacket>>(*equalizerOutputConduit);
     auto harmonicTransformOutputConduit = std::make_unique<PacketConduit<HarmonicTransformPacket>>();
     auto harmonicTransformOutput = std::make_unique<PacketDispatcher<HarmonicTransformPacket>>(
             *harmonicTransformOutputConduit
@@ -56,7 +63,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     // mel filterbank
     auto melFilterbankInput = std::make_unique<PacketReceiver<HarmonicTransformPacket>>(
             *harmonicTransformOutputConduit
-            );
+    );
     auto melFilterbankOutputConduit = std::make_unique<PacketConduit<MelSignalPacket>>();
     auto melFilterbankOutput = std::make_unique<PacketDispatcher<MelSignalPacket>>(
             *melFilterbankOutputConduit
@@ -97,6 +104,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
 
     // packet conduit curation
     packetConduitCurator->addPacketConduit(move(stftOutputConduit));
+    packetConduitCurator->addPacketConduit(move(equalizerOutputConduit));
     packetConduitCurator->addPacketConduit(move(harmonicTransformOutputConduit));
     packetConduitCurator->addPacketConduit(move(melFilterbankOutputConduit));
     packetConduitCurator->addPacketConduit(move(audioStreamOutputConduit));

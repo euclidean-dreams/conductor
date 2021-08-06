@@ -13,7 +13,8 @@ HarmonicTransformProcessor::HarmonicTransformProcessor(std::unique_ptr<PacketRec
           initialPhi{3},
           maxPhiDivisor{2},
           harmonicSignalMagnitudeMultiplier{100},
-          harmonicSignalPeakDecay{0.1} {
+          harmonicSignalPeakDecay{0.1},
+          lastPacket{} {
     initializeHarmonicSignalSnapshots();
     initializeLowPhiHarmonicSignals();
 }
@@ -55,8 +56,14 @@ void HarmonicTransformProcessor::initializeLowPhiHarmonicSignals() {
 }
 
 void HarmonicTransformProcessor::process() {
+    if (lastPacket == nullptr) {
+        lastPacket = input->getPacket();
+    }
+
     auto currentPacket = input->getPacket();
     auto &currentSTFT = *currentPacket;
+    auto &lastSTFT = *lastPacket;
+
 
     // calculate signal derivative
     std::vector<double> signalDerivative;
@@ -65,7 +72,12 @@ void HarmonicTransformProcessor::process() {
         if (index == 0) {
             signalDerivative.push_back(0);
         } else {
-            signalDerivative.push_back(currentSTFT.getMagnitude(index) - currentSTFT.getMagnitude(index - 1));
+//            auto horizontalDerivative = currentSTFT.getMagnitude(index) - lastSTFT.getMagnitude(index);
+//            auto previousHorizontalDerivative = currentSTFT.getMagnitude(index - 1) - lastSTFT.getMagnitude(index - 1);
+//            auto verticalDerivative = horizontalDerivative - previousHorizontalDerivative;
+            auto verticalDerivative = currentSTFT.getMagnitude(index) - currentSTFT.getMagnitude(index - 1);
+            auto sample = verticalDerivative + (currentSTFT.getMagnitude(index) - lastSTFT.getMagnitude(index));
+            signalDerivative.push_back(verticalDerivative);
         }
     }
 
@@ -107,6 +119,7 @@ void HarmonicTransformProcessor::process() {
         outputPacket->addSample(harmonicOutput);
     }
     output->sendPacket(move(outputPacket));
+    lastPacket = move(currentPacket);
 }
 
 }

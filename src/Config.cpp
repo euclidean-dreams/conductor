@@ -41,6 +41,12 @@ Config::Config() {
     stftHopSize = configFile["stft"]["hop_size"].as<int>();
     stftWindowSize = configFile["stft"]["window_size"].as<int>();
 
+    for (auto scalingFactor : configFile["equalizer"]["default_scaling_factors"]) {
+        auto frequency = scalingFactor.first.as<int>();
+        auto scale = scalingFactor.second.as<float>();
+        equalizerScalingFactors.emplace(frequency, scale);
+    }
+
     outputFilePath = configFile["file_writer"]["output_file_path"].as<std::string>();
 
     specfluxThreshold = configFile["specflux_onset_processor"]["threshold"].as<float>();
