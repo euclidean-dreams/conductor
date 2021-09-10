@@ -27,7 +27,7 @@ private:
     std::string inputAudioFile;
 
     // pipeline
-    std::string parameterEndpoint;
+    std::string morselEndpoint;
     std::string performerOutputEndpoint;
     std::string dataOutputEndpoint;
     bool recordToFiles;
@@ -65,7 +65,7 @@ public:
 
     std::string getInputAudioFile() const { return inputAudioFile; }
 
-    std::string getParameterEndpoint() const { return parameterEndpoint; }
+    std::string getMorselEndpoint() const { return morselEndpoint; }
 
     std::string getPerformerOutputEndpoint() const { return performerOutputEndpoint; }
 

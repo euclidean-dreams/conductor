@@ -32,7 +32,7 @@ Config::Config() {
     inputAudioFile = configFile["audio_file_reader"]["audio_input_file"].as<std::string>();
 
     // pipeline
-    parameterEndpoint = configFile["suite"]["parameter_endpoint"].as<std::string>();
+    morselEndpoint = configFile["suite"]["morsel_endpoint"].as<std::string>();
     performerOutputEndpoint = configFile["suite"]["performer_output_endpoint"].as<std::string>();
     dataOutputEndpoint = configFile["suite"]["data_output_endpoint"].as<std::string>();
     recordToFiles = configFile["suite"]["record_to_files"].as<bool>();

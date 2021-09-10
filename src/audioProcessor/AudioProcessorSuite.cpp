@@ -43,10 +43,16 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     audioProcessors.push_back(move(stftProcessor));
 
     // equalizer
+    auto morselSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getMorselEndpoint(),
+                                                                         zmq::socket_type::sub, true);
+    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatMorsel);
+    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatArrayMorsel);
     auto equalizerInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
     auto equalizerOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
     auto equalizerOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*equalizerOutputConduit);
-    auto equalizerProcessor = std::make_unique<EqualizerProcessor>(move(equalizerInput), move(equalizerOutput));
+    auto equalizerProcessor = std::make_unique<EqualizerProcessor>(
+            move(equalizerInput), move(equalizerOutput), move(morselSocket)
+    );
     audioProcessors.push_back(move(equalizerProcessor));
 
     // harmonic transform

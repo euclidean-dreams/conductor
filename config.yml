@@ -18,8 +18,8 @@ audio_file_reader:
 
 # pipeline
 suite:
-  parameter_endpoint: tcp://10.0.0.132:44440
-  performer_output_endpoint: ipc:///tmp/wow #tcp://*:44441
+  morsel_endpoint: tcp://0.0.0.0:44440
+  performer_output_endpoint: tcp://*:44441
   data_output_endpoint: tcp://*:44442
   record_to_files: false
   send_data: false
@@ -32,16 +32,16 @@ stft:
 
 equalizer:
   default_scaling_factors:
-    100: 0.3
-    200: 0.5
-    400: 0.5
-    1000: 1
-    2000: 1.5
-    20000: 2
+    100: 2.4
+    200: 4.0
+    400: 4.0
+    1000: 8.0
+    2000: 12.0
+    20000: 32
 
 file_writer:
-  output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
-#  output_file_path: /root/output/
+#  output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
+  output_file_path: /root/output/
 
 specflux_onset_processor:
   threshold: 1.0

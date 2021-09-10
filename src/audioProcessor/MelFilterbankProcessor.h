@@ -12,7 +12,7 @@ namespace conductor {
 
 class MelFilterbankProcessor : public AudioProcessor {
 private:
-    inline static const int FILTERBANK_COUNT = 180;
+    inline static const int FILTERBANK_COUNT = 74 * 5;
     inline static const int FILTERBANK_MAX_FREQUENCY_DENOMINATOR = 32;
 
     std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input;

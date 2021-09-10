@@ -13,12 +13,15 @@ class EqualizerProcessor : public AudioProcessor {
 private:
     std::unique_ptr<PacketReceiver<STFTPacket>> input;
     std::unique_ptr<PacketDispatcher<STFTPacket>> output;
+    std::unique_ptr<impresarioUtils::NetworkSocket> morselSocket;
+    std::map<int, float> defaultScalingFactors;
     std::map<int, float> scalingFactors;
     double sampleRate;
 
 public:
     EqualizerProcessor(std::unique_ptr<PacketReceiver<STFTPacket>> input,
-                       std::unique_ptr<PacketDispatcher<STFTPacket>> output);
+                       std::unique_ptr<PacketDispatcher<STFTPacket>> output,
+                       std::unique_ptr<impresarioUtils::NetworkSocket> morselSocket);
 
     void process() override;
 };
