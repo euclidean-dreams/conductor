@@ -28,7 +28,10 @@ private:
 
     // pipeline
     std::string morselEndpoint;
-    std::string performerOutputEndpoint;
+    std::string matrixPerformerOutputEndpoint;
+    std::string bannerPerformerOutputEndpoint;
+    int matrixLedCount;
+    int bannerLedCount;
     std::string dataOutputEndpoint;
     bool recordToFiles;
     bool sendData;
@@ -43,6 +46,9 @@ private:
     float specfluxThreshold;
     int specfluxPeakPickingWindowSize;
     int specfluxPeakPickingWindowTailMultiplier;
+
+    // mel filterbank
+    int melFilterBankMaxFrequency;
 
     Config();
 
@@ -67,7 +73,13 @@ public:
 
     std::string getMorselEndpoint() const { return morselEndpoint; }
 
-    std::string getPerformerOutputEndpoint() const { return performerOutputEndpoint; }
+    std::string getMatrixPerformerOutputEndpoint() const { return matrixPerformerOutputEndpoint; }
+
+    std::string getBannerPerformerOutputEndpoint() const { return bannerPerformerOutputEndpoint; }
+
+    int getMatrixLedCount() const { return matrixLedCount; }
+
+    int getBannerLedCount() const { return bannerLedCount; }
 
     std::string getDataOutputEndpoint() const { return dataOutputEndpoint; }
 
@@ -88,6 +100,8 @@ public:
     int getSpecfluxPeakPickingWindowSize() const { return specfluxPeakPickingWindowSize; }
 
     int getSpecfluxPeakPickingWindowTailMultiplier() const { return specfluxPeakPickingWindowTailMultiplier; }
+
+    int getMelFilterBankMaxFrequency() const { return melFilterBankMaxFrequency; }
 };
 
 }

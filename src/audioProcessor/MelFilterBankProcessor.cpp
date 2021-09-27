@@ -1,63 +1,64 @@
-#include "MelFilterbankProcessor.h"
+#include "MelFilterBankProcessor.h"
 
 namespace conductor {
 
-MelFilterbankProcessor::MelFilterbankProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
-                                               std::unique_ptr<PacketDispatcher<MelSignalPacket>> output)
+MelFilterBankProcessor::MelFilterBankProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
+                                               std::unique_ptr<PacketDispatcher<MelSignalPacket>> output,
+                                               int filterCount)
         : input{move(input)},
           output{move(output)},
-          filterbankCenters{},
-          filterbankCount{FILTERBANK_COUNT},
-          filterbankMaxFrequencyDenominator{FILTERBANK_MAX_FREQUENCY_DENOMINATOR},
+          filterCount{filterCount},
+          filterBankCenters{},
+          maxFrequency{Config::getInstance().getMelFilterBankMaxFrequency()},
           sampleRate{Config::getInstance().getSampleRate()} {
 
 }
 
-void MelFilterbankProcessor::calculateFilterbankCenters(int fftSize) {
-    auto maxMelFrequency = convertHzToMel(sampleRate / filterbankMaxFrequencyDenominator);
-    auto increment = maxMelFrequency / static_cast<double>(filterbankCount + 1);
-    filterbankCenters.reserve(filterbankCount);
-    for (int index = 1; index <= filterbankCount; index++) {
+void MelFilterBankProcessor::calculateFilterBankCenters(int fftSize) {
+    auto maxMelFrequency = convertHzToMel(maxFrequency);
+    auto increment = maxMelFrequency / static_cast<double>(filterCount + 1);
+    filterBankCenters.reserve(filterCount);
+    for (int index = 1; index <= filterCount; index++) {
         auto melCenter = increment * static_cast<double>(index);
         auto hzCenter = convertMelToHz(melCenter);
         auto binCenter = convertHzToBin(hzCenter, fftSize, sampleRate);
-        filterbankCenters.push_back(binCenter);
+        filterBankCenters.push_back(binCenter);
     }
 }
 
-double MelFilterbankProcessor::convertHzToMel(double value) {
+double MelFilterBankProcessor::convertHzToMel(double value) {
     return 1127 * std::log(1 + value / 700);
 }
 
-double MelFilterbankProcessor::convertMelToHz(double value) {
+double MelFilterBankProcessor::convertMelToHz(double value) {
     return 700 * (std::exp(value / 1127) - 1);
 }
 
-int MelFilterbankProcessor::convertHzToBin(double value, int fftSize, double sampleRate) {
+int MelFilterBankProcessor::convertHzToBin(double value, int fftSize, double sampleRate) {
     return static_cast<int>(std::floor(value * static_cast<double>(fftSize) / sampleRate));
 }
 
-void MelFilterbankProcessor::process() {
+void MelFilterBankProcessor::process() {
     auto packet = input->getPacket();
     auto &harmonicTransform = *packet;
     auto &stft = harmonicTransform.getSTFTPacket();
-    if (filterbankCenters.empty()) {
-        calculateFilterbankCenters(stft.getFFTSize());
+    if (filterBankCenters.empty()) {
+        calculateFilterBankCenters(stft.getFFTSize());
     }
 
     auto outputPacket = std::make_unique<MelSignalPacket>(
-            harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), filterbankCount, packet
+            harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), filterCount, packet
     );
 
-    for (int index = 0; index < filterbankCenters.size(); index++) {
+    for (int index = 0; index < filterBankCenters.size(); index++) {
         auto result = 0.0;
         int firstBinToConsider;
         if (index == 0) {
             firstBinToConsider = 0;
         } else {
-            firstBinToConsider = filterbankCenters[index - 1];
+            firstBinToConsider = filterBankCenters[index - 1];
         }
-        auto centerBin = filterbankCenters[index];
+        auto centerBin = filterBankCenters[index];
         auto positiveBinSlope = 1 / static_cast<double>(centerBin - firstBinToConsider);
         for (int bin = firstBinToConsider + 1; bin < centerBin; bin++) {
             auto factor = positiveBinSlope * static_cast<double>(bin - firstBinToConsider);
@@ -66,10 +67,10 @@ void MelFilterbankProcessor::process() {
         }
 
         int lastBinToConsider;
-        if (index == filterbankCenters.size() - 1) {
+        if (index == filterBankCenters.size() - 1) {
             lastBinToConsider = harmonicTransform.size();
         } else {
-            lastBinToConsider = filterbankCenters[index + 1];
+            lastBinToConsider = filterBankCenters[index + 1];
         }
         auto negativeBinSlope = 1 / static_cast<double>(lastBinToConsider - centerBin);
         for (int bin = centerBin; bin < lastBinToConsider; bin++) {

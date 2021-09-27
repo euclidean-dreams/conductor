@@ -33,7 +33,10 @@ Config::Config() {
 
     // pipeline
     morselEndpoint = configFile["suite"]["morsel_endpoint"].as<std::string>();
-    performerOutputEndpoint = configFile["suite"]["performer_output_endpoint"].as<std::string>();
+    matrixPerformerOutputEndpoint = configFile["suite"]["matrix_performer_output_endpoint"].as<std::string>();
+    bannerPerformerOutputEndpoint = configFile["suite"]["banner_performer_output_endpoint"].as<std::string>();
+    matrixLedCount = configFile["suite"]["matrix_led_count"].as<int>();
+    bannerLedCount = configFile["suite"]["banner_led_count"].as<int>();
     dataOutputEndpoint = configFile["suite"]["data_output_endpoint"].as<std::string>();
     recordToFiles = configFile["suite"]["record_to_files"].as<bool>();
     sendData = configFile["suite"]["send_data"].as<bool>();
@@ -41,7 +44,7 @@ Config::Config() {
     stftHopSize = configFile["stft"]["hop_size"].as<int>();
     stftWindowSize = configFile["stft"]["window_size"].as<int>();
 
-    for (auto scalingFactor : configFile["equalizer"]["default_scaling_factors"]) {
+    for (auto scalingFactor: configFile["equalizer"]["default_scaling_factors"]) {
         auto frequency = scalingFactor.first.as<int>();
         auto scale = scalingFactor.second.as<float>();
         equalizerScalingFactors.emplace(frequency, scale);
@@ -52,6 +55,9 @@ Config::Config() {
     specfluxThreshold = configFile["specflux_onset_processor"]["threshold"].as<float>();
     specfluxPeakPickingWindowSize = configFile["specflux_onset_processor"]["peak_picking_window_size"].as<int>();
     specfluxPeakPickingWindowTailMultiplier = configFile["specflux_onset_processor"]["peak_picking_window_tail_multiplier"].as<int>();
+
+    // mel filter bank
+    melFilterBankMaxFrequency = configFile["mel_filterbank"]["max_frequency"].as<int>();
 }
 
 }

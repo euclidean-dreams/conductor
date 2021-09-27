@@ -18,13 +18,14 @@ audio_file_reader:
 
 # pipeline
 suite:
-  morsel_endpoint: tcp://0.0.0.0:44440
-  performer_output_endpoint: tcp://*:44441
-  data_output_endpoint: tcp://*:44442
+  morsel_endpoint: tcp://10.0.0.219:44440
+  matrix_performer_output_endpoint: tcp://*:44441
+  banner_performer_output_endpoint: tcp://*:44442
+  matrix_led_count: 740
+  banner_led_count: 370
+  data_output_endpoint: tcp://*:44443
   record_to_files: false
   send_data: false
-
-# bandpass processor order must be configured from header
 
 stft:
   hop_size: 4
@@ -32,18 +33,27 @@ stft:
 
 equalizer:
   default_scaling_factors:
-    100: 2.4
-    200: 4.0
-    400: 4.0
-    1000: 8.0
-    2000: 12.0
-    20000: 32
+    100: 9.6
+    200: 16.0
+    400: 16.0
+    1000: 32.0
+    2000: 48.0
+    20000: 128
+#    100: 2.4
+#    200: 4.0
+#    400: 4.0
+#    1000: 8.0
+#    2000: 12.0
+#    20000: 32
 
 file_writer:
-#  output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
+  #  output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
   output_file_path: /root/output/
 
 specflux_onset_processor:
   threshold: 1.0
   peak_picking_window_size: 3
   peak_picking_window_tail_multiplier: 3
+
+mel_filterbank:
+  max_frequency: 1378
