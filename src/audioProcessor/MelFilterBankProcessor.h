@@ -10,19 +10,16 @@
 
 namespace conductor {
 
-class MelFilterbankProcessor : public AudioProcessor {
+class MelFilterBankProcessor : public AudioProcessor {
 private:
-    inline static const int FILTERBANK_COUNT = 180;
-    inline static const int FILTERBANK_MAX_FREQUENCY_DENOMINATOR = 32;
-
     std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input;
     std::unique_ptr<PacketDispatcher<MelSignalPacket>> output;
-    std::vector<int> filterbankCenters;
-    int filterbankCount;
-    int filterbankMaxFrequencyDenominator;
+    std::vector<int> filterBankCenters;
+    int filterCount;
+    int maxFrequency;
     double sampleRate;
 
-    void calculateFilterbankCenters(int fftSize);
+    void calculateFilterBankCenters(int fftSize);
 
     static double convertHzToMel(double value);
 
@@ -31,8 +28,9 @@ private:
     static int convertHzToBin(double value, int fftSize, double sampleRate);
 
 public:
-    MelFilterbankProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
-                           std::unique_ptr<PacketDispatcher<MelSignalPacket>> output);
+    MelFilterBankProcessor(std::unique_ptr<PacketReceiver<HarmonicTransformPacket>> input,
+                           std::unique_ptr<PacketDispatcher<MelSignalPacket>> output,
+                           int filterCount);
 
     void process() override;
 };

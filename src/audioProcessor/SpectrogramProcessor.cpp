@@ -111,7 +111,6 @@ void SpectrogramProcessor::process() {
         outputSpectrogramPacket->addData(outputData);
     }
     output->sendPacket(move(outputSpectrogramPacket));
-    std::cout << "w" << std::endl;
     lastPacket = move(packet);
 }
 

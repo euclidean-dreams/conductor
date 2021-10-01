@@ -85,13 +85,12 @@ set(
         src/audioProcessor/AudioProcessorSuite.cpp src/audioProcessor/AudioProcessorSuite.h
         src/audioProcessor/AudioStreamSource.cpp src/audioProcessor/AudioStreamSource.h
         src/audioProcessor/AudioProcessorSink.cpp src/audioProcessor/AudioProcessorSink.h
-        src/audioProcessor/BandpassProcessor.cpp src/audioProcessor/BandpassProcessor.h
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
         src/audioProcessor/HarmonicTransformProcessor.cpp src/audioProcessor/HarmonicTransformProcessor.h
         src/audioProcessor/SpectrogramProcessor.cpp src/audioProcessor/SpectrogramProcessor.h
         src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
         src/audioProcessor/DisplaySignalProcessor.cpp src/audioProcessor/DisplaySignalProcessor.h
-        src/audioProcessor/MelFilterbankProcessor.cpp src/audioProcessor/MelFilterbankProcessor.h
+        src/audioProcessor/MelFilterBankProcessor.cpp src/audioProcessor/MelFilterBankProcessor.h
         src/audioProcessor/FileWriter.h
 
         src/packet/Cleanable.h
@@ -113,7 +112,8 @@ set(
         src/packet/HarmonicTransformPacket.cpp src/packet/HarmonicTransformPacket.h
         src/packet/DisplaySignalPacket.cpp src/packet/DisplaySignalPacket.h
         src/packet/MelSignalPacket.cpp src/packet/MelSignalPacket.h
-        src/audioProcessor/EqualizerProcessor.cpp src/audioProcessor/EqualizerProcessor.h)
+        src/audioProcessor/EqualizerProcessor.cpp src/audioProcessor/EqualizerProcessor.h
+        src/audioProcessor/MaterializationProcessor.cpp src/audioProcessor/MaterializationProcessor.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 
