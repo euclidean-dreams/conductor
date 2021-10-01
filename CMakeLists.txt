@@ -113,7 +113,7 @@ set(
         src/packet/DisplaySignalPacket.cpp src/packet/DisplaySignalPacket.h
         src/packet/MelSignalPacket.cpp src/packet/MelSignalPacket.h
         src/audioProcessor/EqualizerProcessor.cpp src/audioProcessor/EqualizerProcessor.h
-)
+        src/audioProcessor/MaterializationProcessor.cpp src/audioProcessor/MaterializationProcessor.h)
 list(APPEND TARGETS conductor)
 add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 

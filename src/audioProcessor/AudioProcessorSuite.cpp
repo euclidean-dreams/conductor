@@ -104,7 +104,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
             *matrixMelFilterbankOutputConduit
     );
     auto matrixDisplaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*matrixPerformerSinkInputConduit);
-    auto matrixSignalProcessor = std::make_unique<DisplaySignalProcessor>(
+    auto matrixSignalProcessor = std::make_unique<MaterializationProcessor>(
             move(matrixDisplaySignalInput), move(matrixDisplaySignalOutput)
     );
     audioProcessors.push_back(move(matrixSignalProcessor));
@@ -112,7 +112,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
             *matrixMelFilterbankOutputConduit
     );
     auto bannerDisplaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*bannerPerformerSinkInputConduit);
-    auto bannerSignalProcessor = std::make_unique<DisplaySignalProcessor>(
+    auto bannerSignalProcessor = std::make_unique<MaterializationProcessor>(
             move(bannerDisplaySignalInput), move(bannerDisplaySignalOutput)
     );
     audioProcessors.push_back(move(bannerSignalProcessor));
