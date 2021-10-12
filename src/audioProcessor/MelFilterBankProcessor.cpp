@@ -75,8 +75,8 @@ void MelFilterBankProcessor::process() {
         auto negativeBinSlope = 1 / static_cast<double>(lastBinToConsider - centerBin);
         for (int bin = centerBin; bin < lastBinToConsider; bin++) {
             auto factor = 1 - negativeBinSlope * static_cast<double>(bin - centerBin);
-            auto value = harmonicTransform.getSample(bin) * stft.getMagnitude(bin) * factor;
-            result += value;
+//            auto value = harmonicTransform.getSample(bin) * stft.getMagnitude(bin) * factor;
+//            result += value;
         }
         outputPacket->addSample(result);
     }

@@ -12,6 +12,7 @@
 #include "audioProcessor/AudioStreamSource.h"
 #include "audioProcessor/AudioProcessorSink.h"
 #include "audioProcessor/HarmonicTransformProcessor.h"
+#include "audioProcessor/TimbralTransformProcessor.h"
 #include "audioProcessor/SpectrogramProcessor.h"
 #include "audioProcessor/FileWriter.h"
 #include "audioProcessor/PacketTypeConverter.h"

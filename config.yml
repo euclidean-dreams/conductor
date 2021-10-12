@@ -2,7 +2,7 @@ general:
   logger_name: conductor
   sample_rate: 44100.00
   audio_packet_size: 128
-  real_time_input: true
+  real_time_input: false
 
 # packetry
 packet_conduit_curator:
@@ -13,8 +13,8 @@ ring_buffer:
   size_multiplier: 16
 
 audio_file_reader:
-#  audio_input_file: /home/josiah/projects/code/impresario-systems/conductor/snippets/raw/yt1s.com - POLO  PAN  Feel Good Official video.raw
-  audio_input_file: /root/input/input.raw
+  audio_input_file: /home/josiah/projects/code/impresario-systems/conductor/snippets/raw/schramm_snip.raw
+#  audio_input_file: /root/input/input.raw
 
 # pipeline
 suite:
@@ -24,7 +24,7 @@ suite:
   matrix_led_count: 740
   banner_led_count: 370
   data_output_endpoint: tcp://*:44443
-  record_to_files: false
+  record_to_files: true
   send_data: false
 
 stft:
@@ -47,8 +47,8 @@ equalizer:
 #    20000: 32
 
 file_writer:
-#    output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
-  output_file_path: /root/output/
+    output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
+#  output_file_path: /root/output/
 
 specflux_onset_processor:
   threshold: 1.0

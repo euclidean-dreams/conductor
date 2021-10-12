@@ -2,7 +2,7 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="conductor (21bcc28b-043a-4342-8a2e-16eadf376e46)">
+      <paths name="ambrose">
         <serverdata>
           <mappings>
             <mapping deploy="/root/conductor-deployment" local="$PROJECT_DIR$" />
@@ -10,6 +10,8 @@
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-local" />
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-conductor" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-local" />
+            <excludedPath local="true" path="$PROJECT_DIR$/snippets" />
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-conductor" />
             <excludedPath local="true" path="$PROJECT_DIR$/legacy" />
           </excludedPaths>

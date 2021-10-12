@@ -19,98 +19,45 @@ void SpectrogramProcessor::process() {
     auto &harmonicTransform = melSignal.getHarmonicTransformPacket();
     auto &stft = harmonicTransform.getSTFTPacket();
 
-    std::vector<double> signalDerivative{};
-    signalDerivative.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        if (index == 0) {
-            signalDerivative.push_back(0);
-        } else {
-            auto derivative = stft.getMagnitude(index) - stft.getMagnitude(index - 1);
-            signalDerivative.push_back(derivative);
+    // psi hardcoded here
+    auto psi = 6;
+
+    std::vector<double> normalizedTimbralSignals{};
+    for (int index = 0; index < stft.size(); index++) {
+        float largestSample = 0;
+        for (int psindex = 0; psindex < psi; psindex++) {
+            auto sample = harmonicTransform.getSample(index * psi + psindex);
+            if (sample > largestSample) {
+                largestSample = sample;
+            }
+        }
+        for (int psindex = 0; psindex < psi; psindex++) {
+            auto sample = harmonicTransform.getSample(index * psi + psindex);
+            normalizedTimbralSignals.push_back(sample / largestSample);
         }
     }
 
-    std::vector<double> horizontalHarmonicDerivative{};
-    horizontalHarmonicDerivative.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        auto derivative = harmonicTransform.getSample(index) - (*lastPacket).getHarmonicTransformPacket().getSample(index);
-        horizontalHarmonicDerivative.push_back(derivative);
-    }
-
-    std::vector<double> verticalHarmonicDerivative{};
-    verticalHarmonicDerivative.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        if (index == 0) {
-            verticalHarmonicDerivative.push_back(0);
-        } else {
-            auto derivative = harmonicTransform.getSample(index) - harmonicTransform.getSample(index - 1);
-            verticalHarmonicDerivative.push_back(derivative);
+    auto layerCount = 4;
+    for (auto iteration = 0; iteration < psi; iteration++) {
+        auto outputSpectrogramPacket = std::make_unique<SpectrogramPacket>(
+                harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), layerCount
+        );
+        std::vector<double> outputData{};
+        outputData.resize(layerCount);
+        for (int index = 0; index < stft.size(); index++) {
+            if (iteration == 0) {
+                outputData[0] = stft.getMagnitude(index);
+            } else {
+                outputData[0] = 0;
+            }
+            outputData[1] = stft.getMagnitude(index);
+            auto timbralIndex = index * psi + iteration;
+            outputData[2] = harmonicTransform.getSample(timbralIndex);
+            outputData[3] = normalizedTimbralSignals[timbralIndex];
+            outputSpectrogramPacket->addData(outputData);
         }
+        output->sendPacket(move(outputSpectrogramPacket));
     }
-
-    std::vector<double> harmonicallyScaledSignal{};
-    harmonicallyScaledSignal.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        harmonicallyScaledSignal.push_back(stft.getMagnitude(index) * harmonicTransform.getSample(index));
-    }
-
-    std::vector<double> horizontalScaledDerivative{};
-    horizontalScaledDerivative.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        auto derivative = harmonicallyScaledSignal[index]
-                          - ((*lastPacket).getHarmonicTransformPacket().getSample(index)
-                             * (*lastPacket).getHarmonicTransformPacket().getSTFTPacket().getMagnitude(index));
-        horizontalScaledDerivative.push_back(derivative);
-    }
-
-    std::vector<double> verticalScaledDerivative{};
-    verticalScaledDerivative.reserve(harmonicTransform.size());
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        if (index == 0) {
-            verticalScaledDerivative.push_back(0);
-        } else {
-            auto derivative = harmonicallyScaledSignal[index] - harmonicallyScaledSignal[index - 1];
-            verticalScaledDerivative.push_back(derivative);
-        }
-    }
-
-    auto layerCount = 3;
-    auto outputSpectrogramPacket = std::make_unique<SpectrogramPacket>(
-            harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), layerCount
-    );
-    std::vector<double> outputData{};
-    outputData.resize(layerCount);
-    for (int index = 0; index < harmonicTransform.size(); index++) {
-        outputData[0] = stft.getMagnitude(index);
-        outputData[1] = harmonicTransform.getSample(index);
-        if (outputData[1] < 0) {
-            outputData[1] = 0;
-        }
-        outputData[2] = harmonicallyScaledSignal[index];
-//        outputData[3] = verticalScaledDerivative[index];
-//
-////        // playground
-//        auto fireCount = 0;
-//        if (index < harmonicTransform.size() - 1) {
-//            if (verticalScaledDerivative[index + 1] <= 0
-//                && verticalScaledDerivative[index] > 0
-//                && harmonicallyScaledSignal[index] > 50) {
-//                outputData[4] = harmonicallyScaledSignal[index];
-//                fireCount++;
-//            } else {
-//                outputData[4] = 0;
-//            }
-//        } else {
-//            outputData[4] = 0;
-//        }
-//        if (index < melSignal.size()) {
-//            outputData[5] = melSignal.getSample(index);
-//        } else {
-//            outputData[5] = 0;
-//        }
-        outputSpectrogramPacket->addData(outputData);
-    }
-    output->sendPacket(move(outputSpectrogramPacket));
     lastPacket = move(packet);
 }
 

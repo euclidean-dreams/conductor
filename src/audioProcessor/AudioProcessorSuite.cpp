@@ -70,7 +70,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     auto harmonicTransformOutput = std::make_unique<PacketDispatcher<HarmonicTransformPacket>>(
             *harmonicTransformOutputConduit
     );
-    auto harmonicTransformProcessor = std::make_unique<HarmonicTransformProcessor>(
+    auto harmonicTransformProcessor = std::make_unique<TimbralTransformProcessor>(
             move(harmonicTransformInput), move(harmonicTransformOutput)
     );
     audioProcessors.push_back(move(harmonicTransformProcessor));
@@ -130,7 +130,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
         audioProcessors.push_back(move(spectrogramProcessor));
 
         auto fileWriterInput = std::make_unique<PacketReceiver<SpectrogramPacket>>(*spectrogramOutputConduit);
-        auto relativePath = std::string{"quickAndCurious.jl"};
+        auto relativePath = std::string{"output.condout"};
         auto fileWriter = std::make_unique<FileWriter<SpectrogramPacket>>(move(fileWriterInput), relativePath);
         audioProcessors.push_back(move(fileWriter));
         packetConduitCurator->addPacketConduit(move(spectrogramOutputConduit));

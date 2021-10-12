@@ -4,8 +4,11 @@
   <component name="CidrRootsConfiguration">
     <excludeRoots>
       <file path="$PROJECT_DIR$/cmake-build-debug-conductor" />
+      <file path="$PROJECT_DIR$/cmake-build-debug-local" />
+      <file path="$PROJECT_DIR$/cmake-build-local" />
       <file path="$PROJECT_DIR$/cmake-build-release-conductor" />
       <file path="$PROJECT_DIR$/legacy" />
+      <file path="$PROJECT_DIR$/snippets" />
     </excludeRoots>
   </component>
 </project>
