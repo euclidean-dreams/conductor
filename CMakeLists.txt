@@ -88,7 +88,6 @@ set(
         src/audioProcessor/STFTProcessor.cpp src/audioProcessor/STFTProcessor.h
         src/audioProcessor/HarmonicTransformProcessor.cpp src/audioProcessor/HarmonicTransformProcessor.h
         src/audioProcessor/SpectrogramProcessor.cpp src/audioProcessor/SpectrogramProcessor.h
-        src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.cpp src/audioProcessor/onsetProcessor/SpecFluxOnsetProcessor.h
         src/audioProcessor/DisplaySignalProcessor.cpp src/audioProcessor/DisplaySignalProcessor.h
         src/audioProcessor/MelFilterBankProcessor.cpp src/audioProcessor/MelFilterBankProcessor.h
         src/audioProcessor/FileWriter.h
