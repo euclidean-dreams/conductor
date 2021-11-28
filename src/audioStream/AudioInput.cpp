@@ -5,13 +5,23 @@ namespace conductor {
 AudioInput::AudioInput(float sampleRate, int packetSize)
         : inputStream{},
           outputStream{packetSize} {
-    throwOnPortaudioError(Pa_OpenDefaultStream(
+    enumerateAudioDevices();
+    auto inputDevice = Config::getInstance().getAudioDevice();
+    spdlog::get(Config::getInstance().getLoggerName())->info(
+            "using audio device: {}", Pa_GetDeviceInfo(inputDevice)->name);
+    PaStreamParameters inputParameters;
+    inputParameters.device = inputDevice;
+    inputParameters.channelCount = 1;
+    inputParameters.sampleFormat = paFloat32;
+    inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputDevice)->defaultLowInputLatency;
+    inputParameters.hostApiSpecificStreamInfo = nullptr;
+    throwOnPortaudioError(Pa_OpenStream(
             &inputStream,
-            1,
-            0,
-            paFloat32,
+            &inputParameters,
+            nullptr,
             sampleRate,
             paFramesPerBufferUnspecified,
+            paNoFlag,
             streamCallback,
             &outputStream
     ));
@@ -30,6 +40,15 @@ int AudioInput::streamCallback(const void *input, void *output, unsigned long fr
     auto ringBuffer = static_cast<RingBuffer *>(userData);
     ringBuffer->addSamples(samples, frameCount);
     return paContinue;
+}
+
+void AudioInput::enumerateAudioDevices() {
+    auto logger = spdlog::get(Config::getInstance().getLoggerName());
+    logger->info("enumerating audio devices");
+    for (int i = 0; i < Pa_GetDeviceCount(); i++) {
+        auto defaultDeviceInfo = Pa_GetDeviceInfo(i);
+        logger->info("device {}: {}", i, defaultDeviceInfo->name);
+    }
 }
 
 }

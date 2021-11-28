@@ -14,6 +14,7 @@ private:
     static std::unique_ptr<Config> instance;
 
     std::string loggerName;
+    int audioDevice;
     float sampleRate;
     int audioPacketSize;
     bool realTimeInput;
@@ -58,6 +59,8 @@ public:
     static void initialize();
 
     std::string getLoggerName() const { return loggerName; }
+
+    int getAudioDevice() const { return audioDevice; }
 
     float getSampleRate() const { return sampleRate; }
 

@@ -19,6 +19,7 @@ Config &Config::getInstance() {
 Config::Config() {
     auto configFile = YAML::LoadFile(std::string{CONFIG_FILE_PATH});
     loggerName = configFile["general"]["logger_name"].as<std::string>();
+    audioDevice = configFile["general"]["audio_device"].as<int>();
     sampleRate = configFile["general"]["sample_rate"].as<float>();
     audioPacketSize = configFile["general"]["audio_packet_size"].as<int>();
     realTimeInput = configFile["general"]["real_time_input"].as<bool>();

@@ -7,6 +7,7 @@
 #include <ImpresarioUtils.h>
 #include "RingBuffer.h"
 #include "audioStream/AudioUtils.h"
+#include <spdlog/spdlog.h>
 
 namespace conductor {
 
@@ -23,6 +24,8 @@ public:
     static int streamCallback(const void *input, void *output, unsigned long frameCount,
                               const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                               void *userData);
+
+    static void enumerateAudioDevices();
 };
 
 }
