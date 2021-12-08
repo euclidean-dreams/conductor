@@ -13,7 +13,7 @@ private:
     std::shared_ptr<const STFTPacket> stftPacket;
 
 public:
-    HarmonicTransformPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size,
+    HarmonicTransformPacket(uint64_t originTimestamp, int size,
                             std::shared_ptr<const STFTPacket> stftPacket);
 
     const STFTPacket &getSTFTPacket() const;

@@ -9,14 +9,11 @@ namespace conductor {
 class AudioPacket : public Packet {
 protected:
     uint64_t originTimestamp;
-    ImpresarioSerialization::FrequencyBand frequencyBand;
 
 public:
-    AudioPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand);
+    AudioPacket(uint64_t originTimestamp);
 
     uint64_t getOriginTimestamp() const;
-
-    ImpresarioSerialization::FrequencyBand getFrequencyBand() const;
 };
 
 }

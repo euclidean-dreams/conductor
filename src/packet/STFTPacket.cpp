@@ -2,16 +2,16 @@
 
 namespace conductor {
 
-STFTPacket::STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size,
+STFTPacket::STFTPacket(uint64_t originTimestamp, int size,
                        int fftSize)
-        : AudioPacket{originTimestamp, frequencyBand},
+        : AudioPacket{originTimestamp},
           signal{size},
           fftSize{fftSize} {
 
 }
 
 STFTPacket::STFTPacket(const STFTPacket &original)
-        : AudioPacket{original.originTimestamp, original.frequencyBand},
+        : AudioPacket{original.originTimestamp},
           signal{original.size()},
           fftSize{original.fftSize} {
     for (int i = 0; i < original.size(); i++) {

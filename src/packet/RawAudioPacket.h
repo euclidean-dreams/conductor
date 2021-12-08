@@ -12,7 +12,7 @@ private:
     Signal<float> signal;
 
 public:
-    RawAudioPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
+    RawAudioPacket(uint64_t originTimestamp, int size);
 
     void writeToFile(std::ofstream &fileStream) const override;
 

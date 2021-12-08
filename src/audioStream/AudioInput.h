@@ -15,6 +15,7 @@ class AudioInput : virtual impresarioUtils::NonCopyable {
 private:
     PaStream *inputStream;
     RingBuffer outputStream;
+    PaStreamParameters inputParameters;
 
 public:
     AudioInput(float sampleRate, int packetSize);

@@ -15,24 +15,24 @@ EqualizerProcessor::EqualizerProcessor(std::unique_ptr<PacketReceiver<STFTPacket
 }
 
 void EqualizerProcessor::process() {
-    auto morselWrapper = morselSocket->receiveSerializedData(zmq::recv_flags::dontwait);
+    auto morselWrapper = morselSocket->receiveParcel(zmq::recv_flags::dontwait);
     if (morselWrapper != nullptr) {
-        if (morselWrapper->getIdentifier() == ImpresarioSerialization::Identifier::floatMorsel) {
-            auto morsel = ImpresarioSerialization::GetFloatMorsel(morselWrapper->getBuffer());
-            if (morsel->field() == 10) {
-                scalingFactors[100] = morsel->value() * defaultScalingFactors[100];
-                scalingFactors[200] = morsel->value() * defaultScalingFactors[200];
-                scalingFactors[400] = morsel->value() * defaultScalingFactors[400];
-                scalingFactors[1000] = morsel->value() * defaultScalingFactors[1000];
-                scalingFactors[2000] = morsel->value() * defaultScalingFactors[2000];
-                scalingFactors[20000] = morsel->value() * defaultScalingFactors[20000];
-            }
-        }
+//        if (morselWrapper->getIdentifier() == ImpresarioSerialization::Identifier::floatMorsel) {
+//            auto morsel = ImpresarioSerialization::GetFloatMorsel(morselWrapper->getBuffer());
+//            if (morsel->field() == 10) {
+//                scalingFactors[100] = morsel->value() * defaultScalingFactors[100];
+//                scalingFactors[200] = morsel->value() * defaultScalingFactors[200];
+//                scalingFactors[400] = morsel->value() * defaultScalingFactors[400];
+//                scalingFactors[1000] = morsel->value() * defaultScalingFactors[1000];
+//                scalingFactors[2000] = morsel->value() * defaultScalingFactors[2000];
+//                scalingFactors[20000] = morsel->value() * defaultScalingFactors[20000];
+//            }
+//        }
     }
     auto currentPacket = input->getPacket();
     auto &stftInput = *currentPacket;
     auto outputPacket = std::make_unique<STFTPacket>(
-            stftInput.getOriginTimestamp(), stftInput.getFrequencyBand(), stftInput.size(), stftInput.getFFTSize()
+            stftInput.getOriginTimestamp(), stftInput.size(), stftInput.getFFTSize()
     );
     auto frequencyIncrement = sampleRate / stftInput.getFFTSize();
     auto currentScalingFactorIterator = begin(scalingFactors);

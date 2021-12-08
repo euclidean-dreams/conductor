@@ -12,7 +12,7 @@ AudioProcessorSink::AudioProcessorSink(std::unique_ptr<PacketReceiver<Serializab
 
 void AudioProcessorSink::process() {
     auto packet = input->getPacket();
-    output->sendSerializedData(packet->getIdentifier(), *packet->serialize());
+    output->sendParcel(packet->getIdentifier(), *packet->serialize());
 }
 
 }

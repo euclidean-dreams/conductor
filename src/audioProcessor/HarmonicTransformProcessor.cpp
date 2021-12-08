@@ -84,7 +84,7 @@ void HarmonicTransformProcessor::process() {
     // create output packet
     auto maxPhi = currentSTFT.size() / maxPhiDivisor;
     auto outputPacket = std::make_unique<HarmonicTransformPacket>(
-            currentSTFT.getOriginTimestamp(), currentSTFT.getFrequencyBand(), maxPhi, currentPacket
+            currentSTFT.getOriginTimestamp(), maxPhi, currentPacket
     );
 
     // populate packet with low phi skipped values

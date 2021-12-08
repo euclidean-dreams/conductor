@@ -2,9 +2,8 @@
 
 namespace conductor {
 
-RawAudioPacket::RawAudioPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
-                               int size)
-        : AudioPacket{originTimestamp, frequencyBand},
+RawAudioPacket::RawAudioPacket(uint64_t originTimestamp, int size)
+        : AudioPacket{originTimestamp},
           signal{size} {
 }
 

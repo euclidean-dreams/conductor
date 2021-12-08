@@ -47,7 +47,7 @@ void MelFilterBankProcessor::process() {
     }
 
     auto outputPacket = std::make_unique<MelSignalPacket>(
-            harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), filterCount, packet
+            harmonicTransform.getOriginTimestamp(), filterCount, packet
     );
 
     for (int index = 0; index < filterBankCenters.size(); index++) {

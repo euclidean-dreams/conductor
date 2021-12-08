@@ -2,9 +2,8 @@
 
 namespace conductor {
 
-SpectrogramPacket::SpectrogramPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
-                                     int layerCount)
-        : AudioPacket{originTimestamp, frequencyBand},
+SpectrogramPacket::SpectrogramPacket(uint64_t originTimestamp, int layerCount)
+        : AudioPacket{originTimestamp},
           layers{} {
     layers.resize(layerCount);
 }

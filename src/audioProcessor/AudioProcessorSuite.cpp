@@ -14,23 +14,15 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     auto audioStreamSource = std::make_unique<AudioStreamSource>(audioStream, move(audioStreamOutput));
     audioProcessors.push_back(move(audioStreamSource));
 
-    // performer sinks
-    auto matrixPerformerSinkInputConduit = std::make_unique<PacketConduit<Serializable>>();
-    auto matrixPerformerSinkInput = std::make_unique<PacketReceiver<Serializable>>(*matrixPerformerSinkInputConduit);
-    auto matrixPerformerSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context,
-                                                                                      config.getMatrixPerformerOutputEndpoint(),
-                                                                                      zmq::socket_type::pub, true);
-    auto matrixPerformerSink = std::make_unique<AudioProcessorSink>(move(matrixPerformerSinkInput),
-                                                                    move(matrixPerformerSinkOutput));
-    audioProcessors.push_back(move(matrixPerformerSink));
-    auto bannerPerformerSinkInputConduit = std::make_unique<PacketConduit<Serializable>>();
-    auto bannerPerformerSinkInput = std::make_unique<PacketReceiver<Serializable>>(*bannerPerformerSinkInputConduit);
-    auto bannerPerformerSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context,
-                                                                                      config.getBannerPerformerOutputEndpoint(),
-                                                                                      zmq::socket_type::pub, true);
-    auto bannerPerformerSink = std::make_unique<AudioProcessorSink>(move(bannerPerformerSinkInput),
-                                                                    move(bannerPerformerSinkOutput));
-    audioProcessors.push_back(move(bannerPerformerSink));
+    // performer sink
+    auto cosmographerSinkInputConduit = std::make_unique<PacketConduit<Serializable>>();
+    auto cosmographerSinkInput = std::make_unique<PacketReceiver<Serializable>>(*cosmographerSinkInputConduit);
+    auto cosmographerSinkOutput = std::make_unique<impresarioUtils::NetworkSocket>(context,
+                                                                                   config.getMatrixPerformerOutputEndpoint(),
+                                                                                   zmq::socket_type::pub, true);
+    auto cosmographerSink = std::make_unique<AudioProcessorSink>(move(cosmographerSinkInput),
+                                                                 move(cosmographerSinkOutput));
+    audioProcessors.push_back(move(cosmographerSink));
 
     // data sink
     std::unique_ptr<PacketConduit<Serializable>> dataSinkInputConduit;
@@ -54,8 +46,8 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     // equalizer
     auto morselSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getMorselEndpoint(),
                                                                          zmq::socket_type::sub, false);
-    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatMorsel);
-    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatArrayMorsel);
+//    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatMorsel);
+//    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatArrayMorsel);
     auto equalizerInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
     auto equalizerOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
     auto equalizerOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*equalizerOutputConduit);
@@ -87,35 +79,16 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
             move(matrixMelFilterbankInput), move(matrixMelFilterbankOutput), config.getMatrixLedCount()
     );
     audioProcessors.push_back(move(matrixMelFilterbankProcessor));
-    auto bannerMelFilterbankInput = std::make_unique<PacketReceiver<HarmonicTransformPacket>>(
-            *harmonicTransformOutputConduit
-    );
-    auto bannerMelFilterbankOutputConduit = std::make_unique<PacketConduit<MelSignalPacket>>();
-    auto bannerMelFilterbankOutput = std::make_unique<PacketDispatcher<MelSignalPacket>>(
-            *bannerMelFilterbankOutputConduit
-    );
-    auto bannerMelFilterbankProcessor = std::make_unique<MelFilterBankProcessor>(
-            move(bannerMelFilterbankInput), move(bannerMelFilterbankOutput), config.getBannerLedCount()
-    );
-    audioProcessors.push_back(move(bannerMelFilterbankProcessor));
 
     // display signal processors
     auto matrixDisplaySignalInput = std::make_unique<PacketReceiver<MelSignalPacket>>(
             *matrixMelFilterbankOutputConduit
     );
-    auto matrixDisplaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*matrixPerformerSinkInputConduit);
+    auto matrixDisplaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*cosmographerSinkInputConduit);
     auto matrixSignalProcessor = std::make_unique<MaterializationProcessor>(
             move(matrixDisplaySignalInput), move(matrixDisplaySignalOutput)
     );
     audioProcessors.push_back(move(matrixSignalProcessor));
-    auto bannerDisplaySignalInput = std::make_unique<PacketReceiver<MelSignalPacket>>(
-            *matrixMelFilterbankOutputConduit
-    );
-    auto bannerDisplaySignalOutput = std::make_unique<PacketDispatcher<Serializable>>(*bannerPerformerSinkInputConduit);
-    auto bannerSignalProcessor = std::make_unique<MaterializationProcessor>(
-            move(bannerDisplaySignalInput), move(bannerDisplaySignalOutput)
-    );
-    audioProcessors.push_back(move(bannerSignalProcessor));
 
     // spectrogram output
     if (config.getRecordToFiles()) {
@@ -141,10 +114,8 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     packetConduitCurator->addPacketConduit(move(equalizerOutputConduit));
     packetConduitCurator->addPacketConduit(move(harmonicTransformOutputConduit));
     packetConduitCurator->addPacketConduit(move(matrixMelFilterbankOutputConduit));
-    packetConduitCurator->addPacketConduit(move(bannerMelFilterbankOutputConduit));
     packetConduitCurator->addPacketConduit(move(audioStreamOutputConduit));
-    packetConduitCurator->addPacketConduit(move(matrixPerformerSinkInputConduit));
-    packetConduitCurator->addPacketConduit(move(bannerPerformerSinkInputConduit));
+    packetConduitCurator->addPacketConduit(move(cosmographerSinkInputConduit));
     if (config.getSendData()) {
         packetConduitCurator->addPacketConduit(move(dataSinkInputConduit));
     }

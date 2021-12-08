@@ -2,9 +2,9 @@
 
 namespace conductor {
 
-MelSignalPacket::MelSignalPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand,
+MelSignalPacket::MelSignalPacket(uint64_t originTimestamp,
                                  int size, std::shared_ptr<const HarmonicTransformPacket> harmonicTransformPacket)
-        : AudioPacket(originTimestamp, frequencyBand),
+        : AudioPacket(originTimestamp),
           signal{size},
           harmonicTransformPacket{move(harmonicTransformPacket)} {
 

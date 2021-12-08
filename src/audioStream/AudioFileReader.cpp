@@ -14,8 +14,7 @@ AudioFileReader::AudioFileReader(int packetSize)
 
     auto floats = reinterpret_cast<float *>(readBlock);
     for (int offset = 0; offset < size / sizeof(float); offset += packetSize) {
-        auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(),
-                                                       ImpresarioSerialization::FrequencyBand::all, packetSize);
+        auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(), packetSize);
         for (int i = 0; i < packetSize; i++) {
             auto sample = floats[offset + i];
             packet->addSample(sample);

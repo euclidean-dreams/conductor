@@ -13,7 +13,7 @@ private:
     Signal<float> signal;
 
 public:
-    DisplaySignalPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size);
+    DisplaySignalPacket(uint64_t originTimestamp, int size);
 
     std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
 

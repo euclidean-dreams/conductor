@@ -35,8 +35,7 @@ bool RingBuffer::nextPacketIsReady() const {
 }
 
 std::unique_ptr<RawAudioPacket> RingBuffer::getNextPacket() {
-    auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(),
-                                                   ImpresarioSerialization::FrequencyBand::all, packetSize);
+    auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(), packetSize);
     for (int i = 0; i < packetSize; i++) {
         packet->addSample(*readIterator);
         readIterator++;

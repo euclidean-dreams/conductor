@@ -121,7 +121,7 @@ void MaterializationProcessor::process() {
 
     // send output
     auto outputPacket = std::make_unique<DisplaySignalPacket>(
-            currentPacket->getOriginTimestamp(), currentPacket->getFrequencyBand(), currentPacket->size()
+            currentPacket->getOriginTimestamp(), currentPacket->size()
     );
     for (int index = 0; index < currentPacket->size(); index++) {
         outputPacket->addSample(perceptionMaxima[index]);

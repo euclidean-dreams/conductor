@@ -13,7 +13,7 @@ private:
     std::vector<std::vector<double>> layers;
 
 public:
-    SpectrogramPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int layerCount);
+    SpectrogramPacket(uint64_t originTimestamp, int layerCount);
 
     void writeToFile(std::ofstream &fileStream) const override;
 

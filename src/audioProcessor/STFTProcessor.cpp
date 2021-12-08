@@ -71,8 +71,7 @@ void STFTProcessor::process() {
 #endif // USE_MUFFT
 
     auto &mostRecentPacket = currentPackets.front()->getPacket(0);
-    auto outputPacket = std::make_unique<STFTPacket>(mostRecentPacket.getOriginTimestamp(),
-                                                     mostRecentPacket.getFrequencyBand(), fftSize / 2 + 1, fftSize);
+    auto outputPacket = std::make_unique<STFTPacket>(mostRecentPacket.getOriginTimestamp(), fftSize / 2 + 1, fftSize);
     for (int i = 0; i < fftSize / 2 + 1; i++) {
 #ifdef USE_MUFFT
         auto sample = std::complex<float>(fftOutput[i].real, fftOutput[i].imag);

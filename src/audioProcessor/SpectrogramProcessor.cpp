@@ -76,7 +76,7 @@ void SpectrogramProcessor::process() {
 
     auto layerCount = 3;
     auto outputSpectrogramPacket = std::make_unique<SpectrogramPacket>(
-            harmonicTransform.getOriginTimestamp(), harmonicTransform.getFrequencyBand(), layerCount
+            harmonicTransform.getOriginTimestamp(), layerCount
     );
     std::vector<double> outputData{};
     outputData.resize(layerCount);

@@ -2,10 +2,9 @@
 
 namespace conductor {
 
-HarmonicTransformPacket::HarmonicTransformPacket(uint64_t originTimestamp,
-                                                 ImpresarioSerialization::FrequencyBand frequencyBand, int size,
+HarmonicTransformPacket::HarmonicTransformPacket(uint64_t originTimestamp, int size,
                                                  std::shared_ptr<const STFTPacket> stftPacket)
-        : AudioPacket(originTimestamp, frequencyBand),
+        : AudioPacket(originTimestamp),
           signal{size},
           stftPacket{move(stftPacket)} {
 

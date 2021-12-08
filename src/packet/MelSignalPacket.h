@@ -13,7 +13,7 @@ private:
     std::shared_ptr<const HarmonicTransformPacket> harmonicTransformPacket;
 
 public:
-    MelSignalPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size,
+    MelSignalPacket(uint64_t originTimestamp, int size,
                     std::shared_ptr<const HarmonicTransformPacket> harmonicTransformPacket);
 
     const HarmonicTransformPacket &getHarmonicTransformPacket() const;

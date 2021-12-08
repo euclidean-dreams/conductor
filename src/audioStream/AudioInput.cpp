@@ -4,12 +4,12 @@ namespace conductor {
 
 AudioInput::AudioInput(float sampleRate, int packetSize)
         : inputStream{},
-          outputStream{packetSize} {
+          outputStream{packetSize},
+          inputParameters{} {
     enumerateAudioDevices();
     auto inputDevice = Config::getInstance().getAudioDevice();
     spdlog::get(Config::getInstance().getLoggerName())->info(
             "using audio device: {}", Pa_GetDeviceInfo(inputDevice)->name);
-    PaStreamParameters inputParameters;
     inputParameters.device = inputDevice;
     inputParameters.channelCount = 1;
     inputParameters.sampleFormat = paFloat32;

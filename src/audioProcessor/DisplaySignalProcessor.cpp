@@ -12,7 +12,7 @@ DisplaySignalProcessor::DisplaySignalProcessor(std::unique_ptr<PacketReceiver<Me
 void DisplaySignalProcessor::process() {
     auto currentPacket = input->getPacket();
     auto outputPacket = std::make_unique<DisplaySignalPacket>(
-            currentPacket->getOriginTimestamp(), currentPacket->getFrequencyBand(), currentPacket->size()
+            currentPacket->getOriginTimestamp(), currentPacket->size()
     );
     for (int index = 0; index < currentPacket->size(); index++) {
         outputPacket->addSample(static_cast<float>(currentPacket->getSample(index)));

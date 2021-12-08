@@ -13,7 +13,7 @@ private:
     int fftSize;
 
 public:
-    STFTPacket(uint64_t originTimestamp, ImpresarioSerialization::FrequencyBand frequencyBand, int size, int fftSize);
+    STFTPacket(uint64_t originTimestamp, int size, int fftSize);
 
     STFTPacket(const STFTPacket &original);
 
