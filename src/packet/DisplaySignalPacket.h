@@ -5,15 +5,19 @@
 #include "packet/AudioPacket.h"
 #include "packet/Serializable.h"
 #include "packet/Signal.h"
+#include "MelSignalPacket.h"
 
 namespace conductor {
 
 class DisplaySignalPacket : public AudioPacket, public Serializable {
 private:
     Signal<float> signal;
+    std::shared_ptr<const MelSignalPacket> melSignalPacket;
+    std::vector<float> lagFlux;
 
 public:
-    DisplaySignalPacket(uint64_t originTimestamp, int size);
+    DisplaySignalPacket(uint64_t originTimestamp, int size, std::shared_ptr<const MelSignalPacket> melSignalPacket,
+                        std::vector<float> lagFlux);
 
     std::unique_ptr<flatbuffers::FlatBufferBuilder> serialize() const override;
 

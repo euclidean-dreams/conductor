@@ -9,7 +9,8 @@ MaterializationProcessor::MaterializationProcessor(std::unique_ptr<PacketReceive
           previousSignal{},
           previousPerceptions{},
           perceptionDecay{2},
-          contributionRadius{5} {
+          contributionRadius{5},
+          laggers{} {
 
 }
 
@@ -119,9 +120,42 @@ void MaterializationProcessor::process() {
         }
     }
 
+    // lagFlux
+    std::vector<float> lagFlux{};
+    lagFlux.reserve(currentPacket->size());
+    if (laggers.empty()) {
+        for (int index = 0; index < 5; index++) {
+            std::vector<float> lagger{};
+            lagger.resize(currentPacket->size(), 0);
+            laggers.push_back(move(lagger));
+        }
+    }
+
+    for (int index = 0; index < currentPacket->size(); index++) {
+        auto flux = 0;
+        auto currentValue = currentPacket->getSample(index);
+        for (auto &lagger: laggers) {
+            auto laggerValue = lagger[index];
+            auto derivative = currentValue - laggerValue;
+            if (derivative <= 0) {
+                break;
+            }
+            flux += derivative;
+            currentValue = laggerValue;
+        }
+        lagFlux.push_back(flux);
+    }
+
+    laggers.pop_back();
+    std::vector<float> lagger{};
+    for (int index = 0; index < currentPacket->size(); index++) {
+        lagger.push_back(currentPacket->getSample(index));
+    }
+    laggers.push_front(move(lagger));
+
     // send output
     auto outputPacket = std::make_unique<DisplaySignalPacket>(
-            currentPacket->getOriginTimestamp(), currentPacket->size()
+            currentPacket->getOriginTimestamp(), currentPacket->size(), currentPacket, lagFlux
     );
     for (int index = 0; index < currentPacket->size(); index++) {
         outputPacket->addSample(perceptionMaxima[index]);

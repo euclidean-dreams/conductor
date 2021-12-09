@@ -20,6 +20,9 @@ private:
     float perceptionDecay;
     int contributionRadius;
 
+    // lagFlux
+    std::list<std::vector<float>> laggers;
+
 public:
     MaterializationProcessor(std::unique_ptr<PacketReceiver<MelSignalPacket>> input,
                              std::unique_ptr<PacketDispatcher<Serializable>> output);
