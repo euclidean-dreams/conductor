@@ -18,10 +18,16 @@ std::unique_ptr<flatbuffers::FlatBufferBuilder> DisplaySignalPacket::serialize()
     for (int index = 0; index < melSignalPacket->size(); index++) {
         melSignal.push_back(melSignalPacket->getSample(index));
     }
+    auto &stftPacket = melSignalPacket->getHarmonicTransformPacket().getSTFTPacket();
+    std::vector<float> stft;
+    for (int index = 0; index < stftPacket.size(); index++) {
+        stft.push_back(stftPacket.getMagnitude(index));
+    }
+    auto stftOffset = builder->CreateVector(stft);
     auto mels = builder->CreateVector(melSignal);
     auto radixes = builder->CreateVector(signal.getVectorReference());
     auto lagFluxOffset = builder->CreateVector(lagFlux);
-    auto serializedPacket = ImpresarioSerialization::CreateEssentia(*builder, mels, radixes, lagFluxOffset);
+    auto serializedPacket = ImpresarioSerialization::CreateEssentia(*builder, stftOffset, mels, radixes, lagFluxOffset);
     builder->Finish(serializedPacket);
     return builder;
 }
