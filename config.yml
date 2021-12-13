@@ -1,6 +1,6 @@
 general:
   logger_name: conductor
-  audio_device: 0
+  audio_device: 2
   sample_rate: 44100.00
   audio_packet_size: 128
   real_time_input: true
@@ -22,7 +22,7 @@ suite:
   morsel_endpoint: tcp://10.0.0.219:44440
   matrix_performer_output_endpoint: ipc:///tmp/signalarium
   banner_performer_output_endpoint: tcp://*:44442
-  matrix_led_count: 1480
+  matrix_led_count: 4440
   banner_led_count: 0
   data_output_endpoint: tcp://*:44443
   record_to_files: false
@@ -34,12 +34,12 @@ stft:
 
 equalizer:
   default_scaling_factors:
-    100: 9.6
-    200: 16.0
-    400: 16.0
-    1000: 32.0
-    2000: 48.0
-    20000: 128
+    100: 4.8
+    200: 8.0
+    400: 8.0
+    1000: 16.0
+    2000: 24.0
+    20000: 64
 #    100: 2.4
 #    200: 4.0
 #    400: 4.0

@@ -4,6 +4,7 @@
     <configurations>
       <configuration PROFILE_NAME="Debug-conductor" ENABLED="false" CONFIG_NAME="Debug" TOOLCHAIN_NAME="conductor" GENERATION_OPTIONS="-DUSE_MUFFT=ON" />
       <configuration PROFILE_NAME="Release-conductor" ENABLED="false" CONFIG_NAME="Release" TOOLCHAIN_NAME="conductor" />
+      <configuration PROFILE_NAME="Release-local" ENABLED="false" CONFIG_NAME="Release" GENERATION_OPTIONS="-DUSE_MUFFT=ON" />
       <configuration PROFILE_NAME="Debug-local" ENABLED="true" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DUSE_MUFFT=ON" />
     </configurations>
   </component>
