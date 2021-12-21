@@ -1,6 +1,7 @@
 #ifndef CONDUCTOR_EQUALIZERPROCESSOR_H
 #define CONDUCTOR_EQUALIZERPROCESSOR_H
 
+#include <ImpresarioUtils.h>
 #include "Config.h"
 #include "audioProcessor/AudioProcessor.h"
 #include "packet/PacketDispatcher.h"

@@ -88,11 +88,8 @@ add_executable(conductor src/Main.cpp ${SOURCE_FILES})
 # finalize
 find_package(cppzmq)
 target_include_directories(conductor PRIVATE src)
-target_link_libraries(conductor PRIVATE cppzmq)
 target_link_libraries(conductor PRIVATE impresario-utils)
 target_link_libraries(conductor PRIVATE portaudio)
-target_link_libraries(conductor PRIVATE pthread)
-target_link_libraries(conductor PRIVATE yaml-cpp)
 
 if (USE_MUFFT)
     target_link_libraries(conductor PRIVATE muFFT)

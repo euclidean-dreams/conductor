@@ -46,8 +46,7 @@ AudioProcessorSuite::AudioProcessorSuite(zmq::context_t &context, AudioStream &a
     // equalizer
     auto morselSocket = std::make_unique<impresarioUtils::NetworkSocket>(context, config.getMorselEndpoint(),
                                                                          zmq::socket_type::sub, false);
-//    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatMorsel);
-//    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::floatArrayMorsel);
+    morselSocket->setSubscriptionFilter(ImpresarioSerialization::Identifier::axiomology);
     auto equalizerInput = std::make_unique<PacketReceiver<STFTPacket>>(*stftOutputConduit);
     auto equalizerOutputConduit = std::make_unique<PacketConduit<STFTPacket>>();
     auto equalizerOutput = std::make_unique<PacketDispatcher<STFTPacket>>(*equalizerOutputConduit);
