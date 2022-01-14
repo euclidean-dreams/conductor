@@ -1,6 +1,6 @@
 general:
   logger_name: conductor
-  audio_device: 2
+  audio_device: 0
   sample_rate: 44100.00
   audio_packet_size: 128
   real_time_input: true
@@ -20,9 +20,11 @@ audio_file_reader:
 # pipeline
 suite:
   morsel_endpoint: tcp://10.0.0.219:44440
-  matrix_performer_output_endpoint: ipc:///tmp/signalarium
+  matrix_performer_output_endpoint: ipc:///tmp/analogorium
   banner_performer_output_endpoint: tcp://*:44442
-  matrix_led_count: 4440
+#  matrix_led_count: 7400
+  matrix_led_count: 7400
+  #  matrix_led_count: 740
   banner_led_count: 0
   data_output_endpoint: tcp://*:44443
   record_to_files: false
