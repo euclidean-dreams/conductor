@@ -1,31 +1,40 @@
 #ifndef CONDUCTOR_RINGBUFFER_H
 #define CONDUCTOR_RINGBUFFER_H
 
+#include <mutex>
+#include <condition_variable>
 #include <memory>
 #include <vector>
+#include <ImpresarioUtils.h>
+#include <ImpresarioSerialization.h>
 #include "Config.h"
-#include "AudioStream.h"
+#include "audioStream/AudioStream.h"
+#include "packet/RawAudioPacket.h"
 
-using namespace std;
+namespace conductor {
 
 class RingBuffer : public AudioStream {
 private:
+    std::mutex mutex;
+    std::condition_variable packetAddedExpectant;
     int packetSize;
     int bufferSize;
-    vector<float> internalBuffer;
-    vector<float>::const_iterator readIterator;
-    vector<float>::iterator writeIterator;
+    std::vector<float> internalBuffer;
+    std::vector<float>::const_iterator readIterator;
+    std::vector<float>::iterator writeIterator;
 
 public:
-    explicit RingBuffer(int packetSize, int bufferMultiplier);
+    explicit RingBuffer(int packetSize);
 
     void addSamples(const float *samples, unsigned long count);
 
-    int getPacketSize() const override;
-
     bool nextPacketIsReady() const override;
 
-    std::unique_ptr<vector<float>> getNextPacket() override;
+    void waitUntilNextPacketIsReady() override;
+
+    std::unique_ptr<RawAudioPacket> getNextPacket() override;
 };
+
+}
 
 #endif //PERFORMER_RINGBUFFER_H

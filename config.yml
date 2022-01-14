@@ -1,0 +1,62 @@
+general:
+  logger_name: conductor
+  audio_device: 0
+  sample_rate: 44100.00
+  audio_packet_size: 128
+  real_time_input: true
+
+# packetry
+packet_conduit_curator:
+  tick_interval: 1000
+
+# audio stream
+ring_buffer:
+  size_multiplier: 16
+
+audio_file_reader:
+#  audio_input_file: /home/josiah/projects/code/impresario-systems/conductor/snippets/raw/yt1s.com - POLO  PAN  Feel Good Official video.raw
+  audio_input_file: /root/input/input.raw
+
+# pipeline
+suite:
+  morsel_endpoint: tcp://10.0.0.219:44440
+  matrix_performer_output_endpoint: ipc:///tmp/analogorium
+  banner_performer_output_endpoint: tcp://*:44442
+#  matrix_led_count: 7400
+  matrix_led_count: 7400
+  #  matrix_led_count: 740
+  banner_led_count: 0
+  data_output_endpoint: tcp://*:44443
+  record_to_files: false
+  send_data: false
+
+stft:
+  hop_size: 4
+  window_size: 64
+
+equalizer:
+  default_scaling_factors:
+    100: 4.8
+    200: 8.0
+    400: 8.0
+    1000: 16.0
+    2000: 24.0
+    20000: 64
+#    100: 2.4
+#    200: 4.0
+#    400: 4.0
+#    1000: 8.0
+#    2000: 12.0
+#    20000: 32
+
+file_writer:
+#    output_file_path: /home/josiah/projects/code/impresario-systems/scripts/src/spectrogram_explorer/
+  output_file_path: /root/output/
+
+specflux_onset_processor:
+  threshold: 1.0
+  peak_picking_window_size: 3
+  peak_picking_window_tail_multiplier: 3
+
+mel_filterbank:
+  max_frequency: 5512

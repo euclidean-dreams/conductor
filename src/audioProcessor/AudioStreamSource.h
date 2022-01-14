@@ -2,36 +2,25 @@
 #define CONDUCTOR_AUDIOMANAGER_H
 
 #include <thread>
-#include <memory>
-#include "Config.h"
-#include "Utils.h"
-#include "AudioProcessor.h"
-#include "NetworkSocket.h"
+#include <ImpresarioUtils.h>
+#include "packet/PacketDispatcher.h"
+#include "packet/RawAudioPacket.h"
 #include "audioStream/AudioStream.h"
-#include "AudioPacket_generated.h"
+#include "audioProcessor/AudioProcessor.h"
 
-using namespace ImpresarioSerialization;
-using namespace flatbuffers;
-using namespace std::chrono;
-using namespace std::this_thread;
+namespace conductor {
 
 class AudioStreamSource : public AudioProcessor {
 private:
     AudioStream &audioStream;
-    std::unique_ptr<NetworkSocket> outputSocket;
+    std::unique_ptr<PacketDispatcher<RawAudioPacket>> output;
 
 public:
-    static std::unique_ptr<AudioProcessor> create(context_t &context, AudioStream &audioStream,
-                                                  const string &outputEndpoint);
-
-    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<NetworkSocket> outputSocket);
-
-    void setup() override {};
+    AudioStreamSource(AudioStream &audioStream, std::unique_ptr<PacketDispatcher<RawAudioPacket>> output);
 
     void process() override;
-
-    bool shouldContinue() override;
-
 };
+
+}
 
 #endif //PERFORMER_AUDIOMANAGER_H

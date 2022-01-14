@@ -1,8 +1,12 @@
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(int packetSize, int bufferMultiplier)
-        : packetSize{packetSize},
-          bufferSize{packetSize * bufferMultiplier},
+namespace conductor {
+
+RingBuffer::RingBuffer(int packetSize)
+        : mutex{},
+          packetAddedExpectant{},
+          packetSize{packetSize},
+          bufferSize{packetSize * Config::getInstance().getRingBufferSizeMultiplier()},
           internalBuffer(bufferSize),
           readIterator{internalBuffer.cbegin()},
           writeIterator{internalBuffer.begin()} {
@@ -16,15 +20,9 @@ void RingBuffer::addSamples(const float *samples, unsigned long count) {
         *writeIterator = samples[i];
         writeIterator++;
     }
-}
-
-std::unique_ptr<vector<float>> RingBuffer::getNextPacket() {
-    auto packet = make_unique<vector<float>>(readIterator, readIterator + packetSize);
-    readIterator += packetSize;
-    if (readIterator >= internalBuffer.end()) {
-        readIterator = internalBuffer.cbegin();
+    if (nextPacketIsReady()) {
+        packetAddedExpectant.notify_all();
     }
-    return packet;
 }
 
 bool RingBuffer::nextPacketIsReady() const {
@@ -36,6 +34,23 @@ bool RingBuffer::nextPacketIsReady() const {
     }
 }
 
-int RingBuffer::getPacketSize() const {
-    return packetSize;
+std::unique_ptr<RawAudioPacket> RingBuffer::getNextPacket() {
+    auto packet = std::make_unique<RawAudioPacket>(impresarioUtils::getCurrentTime(), packetSize);
+    for (int i = 0; i < packetSize; i++) {
+        packet->addSample(*readIterator);
+        readIterator++;
+    }
+    if (readIterator >= internalBuffer.end()) {
+        readIterator = internalBuffer.cbegin();
+    }
+    return packet;
+}
+
+void RingBuffer::waitUntilNextPacketIsReady() {
+    std::unique_lock<std::mutex> lock{mutex};
+    while (!nextPacketIsReady()) {
+        packetAddedExpectant.wait(lock);
+    }
+}
+
 }

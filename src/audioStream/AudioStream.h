@@ -2,20 +2,22 @@
 #define CONDUCTOR_AUDIOSTREAM_H
 
 #include <memory>
-#include <vector>
-#include "NonCopyable.h"
+#include <ImpresarioUtils.h>
+#include "packet/RawAudioPacket.h"
 
-using namespace std;
+namespace conductor {
 
-class AudioStream : NonCopyable {
+class AudioStream : virtual impresarioUtils::NonCopyable {
 public:
     virtual ~AudioStream() = default;
 
-    virtual int getPacketSize() const = 0;
-
     virtual bool nextPacketIsReady() const = 0;
 
-    virtual std::unique_ptr<vector<float>> getNextPacket() = 0;
+    virtual void waitUntilNextPacketIsReady() = 0;
+
+    virtual std::unique_ptr<RawAudioPacket> getNextPacket() = 0;
 };
+
+}
 
 #endif //CONDUCTOR_AUDIOSTREAM_H

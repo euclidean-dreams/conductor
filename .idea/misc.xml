@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+  <component name="CidrRootsConfiguration">
+    <libraryRoots>
+      <file path="$PROJECT_DIR$/lib" />
+    </libraryRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/cmake-build-debug-conductor" />
+      <file path="$PROJECT_DIR$/cmake-build-debug-local" />
+      <file path="$PROJECT_DIR$/cmake-build-release-conductor" />
+      <file path="$PROJECT_DIR$/cmake-build-release-local" />
+      <file path="$PROJECT_DIR$/cmake-build-test-local" />
+      <file path="$PROJECT_DIR$/legacy" />
+      <file path="$PROJECT_DIR$/snippets" />
+    </excludeRoots>
+  </component>
+</project>

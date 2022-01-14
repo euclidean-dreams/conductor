@@ -1,36 +1,46 @@
 #ifndef CONDUCTOR_AUDIOPROCESSORSUITE_H
 #define CONDUCTOR_AUDIOPROCESSORSUITE_H
 
-#include <memory>
 #include <thread>
-#include <aubio/aubio.h>
+#include <memory>
+#include <vector>
 #include <zmq.hpp>
+#include <ImpresarioUtils.h>
 #include "Config.h"
-#include "NonCopyable.h"
-#include "NetworkSocket.h"
-#include "AudioStreamSource.h"
 #include "audioStream/AudioStream.h"
-#include "onsetProcessor/OnsetProcessor.h"
-#include "onsetProcessor/OnsetAggregator.h"
+#include "audioProcessor/STFTProcessor.h"
+#include "audioProcessor/AudioStreamSource.h"
+#include "audioProcessor/AudioProcessorSink.h"
+#include "audioProcessor/HarmonicTransformProcessor.h"
+#include "audioProcessor/SpectrogramProcessor.h"
+#include "audioProcessor/FileWriter.h"
+#include "audioProcessor/PacketTypeConverter.h"
+#include "audioProcessor/DisplaySignalProcessor.h"
+#include "audioProcessor/MelFilterBankProcessor.h"
+#include "audioProcessor/MaterializationProcessor.h"
+#include "audioProcessor/EqualizerProcessor.h"
+#include "packet/PacketConduit.h"
+#include "packet/PacketConduitCurator.h"
+#include "packet/FileWritable.h"
+#include "packet/HarmonicTransformPacket.h"
+#include "packet/SpectrogramPacket.h"
+#include "packet/MelSignalPacket.h"
 
-using namespace std;
-using namespace zmq;
+namespace conductor {
 
-class AudioProcessorSuite : NonCopyable {
+class AudioProcessorSuite : virtual impresarioUtils::NonCopyable {
 private:
-    vector <std::unique_ptr<AudioProcessor>> audioProcessors;
-    int endpointCounter;
-
-    inline string generateInprocEndpoint();
+    std::vector<std::unique_ptr<AudioProcessor>> audioProcessors;
+    std::unique_ptr<PacketConduitCurator> packetConduitCurator;
 
 public:
-    AudioProcessorSuite(context_t &context, AudioStream &audioStream);
-
-    ~AudioProcessorSuite();
+    AudioProcessorSuite(zmq::context_t &context, AudioStream &audioStream);
 
     void activate();
 
     static void activateAudioProcessor(AudioProcessor &audioProcessor);
 };
+
+}
 
 #endif //CONDUCTOR_AUDIOPROCESSORSUITE_H

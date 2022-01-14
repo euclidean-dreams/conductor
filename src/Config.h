@@ -1,43 +1,112 @@
 #ifndef CONDUCTOR_CONFIG_H
 #define CONDUCTOR_CONFIG_H
 
-#include <string>
-#include <aubio/aubio.h>
-#include "OnsetMethod_generated.h"
+#include <map>
+#include <memory>
+#include <stdexcept>
+#include <yaml-cpp/yaml.h>
 
-using namespace std;
-using namespace ImpresarioSerialization;
+namespace conductor {
 
-// logger
-const static string LOGGER_NAME = "conductor";
+class Config {
+private:
+    static constexpr std::string_view CONFIG_FILE_PATH = "../config.yml";
+    static std::unique_ptr<Config> instance;
 
-// audio
-const static int PROCESSOR_HOP_SIZE = 128;
-const static int PROCESSOR_BUFFER_SIZE = PROCESSOR_HOP_SIZE * 8;
-const static float SAMPLE_RATE = 44100.00;
-const static int PACKET_SIZE = PROCESSOR_HOP_SIZE;
-const static int RING_BUFFER_SIZE_MULTIPLIER = 16;
+    std::string loggerName;
+    int audioDevice;
+    float sampleRate;
+    int audioPacketSize;
+    bool realTimeInput;
 
-// audio source
-const static int AUDIO_STREAM_QUERY_INTERVAL = 500;
+    // packetry
+    int packetConduitCuratorTickInterval;
 
-// onset
-const static smpl_t DEFAULT_ONSET_THRESHOLD = 0.5;
-const static smpl_t DEFAULT_ONSET_SILENCE = -50.0;
-const static smpl_t DEFAULT_ONSET_MINIOI_MS = 1;
-const static bool DEFAULT_ONSET_ADAPTIVE_WHITENING = true;
+    // audio stream
+    int ringBufferSizeMultiplier;
 
-// processors
-const static string PARAMETER_RECEIVER_ENDPOINT = "tcp://10.0.0.132:5555";
-const static vector<OnsetMethod> ONSET_PROCESSORS = {
-        OnsetMethod::specflux,
-        OnsetMethod::phase,
-        OnsetMethod::complex,
-        OnsetMethod::energy
+    std::string inputAudioFile;
+
+    // pipeline
+    std::string morselEndpoint;
+    std::string matrixPerformerOutputEndpoint;
+    std::string bannerPerformerOutputEndpoint;
+    int matrixLedCount;
+    int bannerLedCount;
+    std::string dataOutputEndpoint;
+    bool recordToFiles;
+    bool sendData;
+
+    int stftHopSize;
+    int stftWindowSize;
+
+    std::map<int, float> equalizerScalingFactors;
+
+    std::string outputFilePath;
+
+    float specfluxThreshold;
+    int specfluxPeakPickingWindowSize;
+    int specfluxPeakPickingWindowTailMultiplier;
+
+    // mel filterbank
+    int melFilterBankMaxFrequency;
+
+    Config();
+
+public:
+    static Config &getInstance();
+
+    static void initialize();
+
+    std::string getLoggerName() const { return loggerName; }
+
+    int getAudioDevice() const { return audioDevice; }
+
+    float getSampleRate() const { return sampleRate; }
+
+    bool getRealTimeInput() const { return realTimeInput; }
+
+    int getAudioPacketSize() const { return audioPacketSize; }
+
+    int getPacketConduitCuratorTickInterval() const { return packetConduitCuratorTickInterval; }
+
+    int getRingBufferSizeMultiplier() const { return ringBufferSizeMultiplier; }
+
+    std::string getInputAudioFile() const { return inputAudioFile; }
+
+    std::string getMorselEndpoint() const { return morselEndpoint; }
+
+    std::string getMatrixPerformerOutputEndpoint() const { return matrixPerformerOutputEndpoint; }
+
+    std::string getBannerPerformerOutputEndpoint() const { return bannerPerformerOutputEndpoint; }
+
+    int getMatrixLedCount() const { return matrixLedCount; }
+
+    int getBannerLedCount() const { return bannerLedCount; }
+
+    std::string getDataOutputEndpoint() const { return dataOutputEndpoint; }
+
+    bool getRecordToFiles() const { return recordToFiles; }
+
+    bool getSendData() const { return sendData; }
+
+    int getSTFTHopSize() const { return stftHopSize; }
+
+    int getSTFTWindowSize() const { return stftWindowSize; }
+
+    std::map<int, float> getEqualizerScalingValues() const { return equalizerScalingFactors; }
+
+    std::string getOutputFilePath() const { return outputFilePath; }
+
+    float getSpecfluxThreshold() const { return specfluxThreshold; }
+
+    int getSpecfluxPeakPickingWindowSize() const { return specfluxPeakPickingWindowSize; }
+
+    int getSpecfluxPeakPickingWindowTailMultiplier() const { return specfluxPeakPickingWindowTailMultiplier; }
+
+    int getMelFilterBankMaxFrequency() const { return melFilterBankMaxFrequency; }
 };
 
-// flatBuffers
-const static int ONSET_SIZE = 24;
-const static int AUDIO_PACKET_SIZE = 1064;
+}
 
-#endif //PERFORMER_CONFIG_H
+#endif //CONDUCTOR_CONFIG_H
