@@ -22,7 +22,7 @@ suite:
   morsel_endpoint: tcp://volitia:44440
   matrix_performer_output_endpoint: ipc:///tmp/analogorium
   banner_performer_output_endpoint: tcp://*:44442
-  matrix_led_count: 7400
+  matrix_led_count: 4400
   banner_led_count: 0
   data_output_endpoint: tcp://*:44443
   record_to_files: false
