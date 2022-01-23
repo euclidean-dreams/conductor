@@ -17,6 +17,11 @@ EqualizerProcessor::EqualizerProcessor(std::unique_ptr<PacketReceiver<STFTPacket
 void EqualizerProcessor::process() {
     auto parcel = morselSocket->receiveParcel(zmq::recv_flags::dontwait);
     if (parcel != nullptr) {
+        auto nextParcel = morselSocket->receiveParcel(zmq::recv_flags::dontwait);
+        while (nextParcel != nullptr) {
+            parcel = move(nextParcel);
+            nextParcel = morselSocket->receiveParcel(zmq::recv_flags::dontwait);
+        }
         if (parcel->getIdentifier() == ImpresarioSerialization::Identifier::axiomology) {
             auto axiomology = impresarioUtils::Unwrap::Axiomology(*parcel);
             auto gain = axiomology->axioms()->Get(1);

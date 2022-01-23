@@ -1,6 +1,6 @@
 general:
   logger_name: conductor
-  audio_device: 0
+  audio_device: 10
   sample_rate: 44100.00
   audio_packet_size: 128
   real_time_input: true

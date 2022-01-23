@@ -7,7 +7,13 @@ AudioInput::AudioInput(float sampleRate, int packetSize)
           outputStream{packetSize},
           inputParameters{} {
     enumerateAudioDevices();
-    auto inputDevice = Config::getInstance().getAudioDevice();
+    int inputDevice;
+    for (int deviceIndex = 0; deviceIndex < Pa_GetDeviceCount(); deviceIndex++) {
+        auto defaultDeviceInfo = Pa_GetDeviceInfo(deviceIndex);
+        if (strcmp(defaultDeviceInfo->name, "USB Audio Device: - (hw:3,0)") == 0) {
+            inputDevice = deviceIndex;
+        }
+    }
     spdlog::get(Config::getInstance().getLoggerName())->info(
             "using audio device: {}", Pa_GetDeviceInfo(inputDevice)->name);
     inputParameters.device = inputDevice;
