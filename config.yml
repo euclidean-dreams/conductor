@@ -33,6 +33,7 @@ stft:
   window_size: 64
 
 equalizer:
+  overall_scaling_factor: 0.2
   default_scaling_factors:
     100: 4.8
     200: 8.0

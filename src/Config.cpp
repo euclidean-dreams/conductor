@@ -45,10 +45,12 @@ Config::Config() {
     stftHopSize = configFile["stft"]["hop_size"].as<int>();
     stftWindowSize = configFile["stft"]["window_size"].as<int>();
 
+    auto equalizerOverallScalingFactor = configFile["equalizer"]["overall_scaling_factor"].as<float>();
     for (auto scalingFactor: configFile["equalizer"]["default_scaling_factors"]) {
         auto frequency = scalingFactor.first.as<int>();
         auto scale = scalingFactor.second.as<float>();
-        equalizerScalingFactors.emplace(frequency, scale);
+        auto adjustedScale = scale * equalizerOverallScalingFactor;
+        equalizerScalingFactors.emplace(frequency, adjustedScale);
     }
 
     outputFilePath = configFile["file_writer"]["output_file_path"].as<std::string>();

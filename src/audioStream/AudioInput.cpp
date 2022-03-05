@@ -10,7 +10,7 @@ AudioInput::AudioInput(float sampleRate, int packetSize)
     int inputDevice;
     for (int deviceIndex = 0; deviceIndex < Pa_GetDeviceCount(); deviceIndex++) {
         auto defaultDeviceInfo = Pa_GetDeviceInfo(deviceIndex);
-        if (strcmp(defaultDeviceInfo->name, "USB Audio Device: - (hw:3,0)") == 0) {
+        if (strcmp(defaultDeviceInfo->name, "USB Audio Device: - (hw:0,0)") == 0) {
             inputDevice = deviceIndex;
         }
     }
